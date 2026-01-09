@@ -1,0 +1,93 @@
+[
+  {
+    "id": 1,
+    "origin_name": "Cyber Hub",
+    "origin_latlon": "28.494700,77.089700",
+    "origin_node": 6618760979,
+    "origin_node_latlon": "28.494925,77.089788",
+    "origin_snap_m": 26.3,
+    "dest_name": "IFFCO Chowk",
+    "dest_latlon": "28.472600,77.072600",
+    "dest_node": 6112563504,
+    "dest_node_latlon": "28.472526,77.072494",
+    "dest_snap_m": 13.2
+  },
+  {
+    "id": 2,
+    "origin_name": "Huda City Centre",
+    "origin_latlon": "28.459500,77.072200",
+    "origin_node": 6458783798,
+    "origin_node_latlon": "28.459034,77.071442",
+    "origin_snap_m": 90.4,
+    "dest_name": "MG Road",
+    "dest_latlon": "28.479500,77.080600",
+    "dest_node": 6618342489,
+    "dest_node_latlon": "28.479770,77.080663",
+    "dest_snap_m": 30.5
+  },
+  {
+    "id": 3,
+    "origin_name": "Rajiv Chowk",
+    "origin_latlon": "28.469100,77.036600",
+    "origin_node": 2229152797,
+    "origin_node_latlon": "28.469249,77.036500",
+    "origin_snap_m": 19.2,
+    "dest_name": "IFFCO Chowk",
+    "dest_latlon": "28.472600,77.072600",
+    "dest_node": 6112563504,
+    "dest_node_latlon": "28.472526,77.072494",
+    "dest_snap_m": 13.2
+  },
+  {
+    "id": 4,
+    "origin_name": "Golf Course Rd",
+    "origin_latlon": "28.450300,77.097200",
+    "origin_node": 6659991847,
+    "origin_node_latlon": "28.450485,77.097211",
+    "origin_snap_m": 20.5,
+    "dest_name": "Sohna Road",
+    "dest_latlon": "28.407300,77.046000",
+    "dest_node": 313253807,
+    "dest_node_latlon": "28.407334,77.045747",
+    "dest_snap_m": 25.1
+  },
+  {
+    "id": 5,
+    "origin_name": "Sector 56",
+    "origin_latlon": "28.424400,77.107000",
+    "origin_node": 3654279897,
+    "origin_node_latlon": "28.424439,77.106905",
+    "origin_snap_m": 10.2,
+    "dest_name": "Huda City Centre",
+    "dest_latlon": "28.459500,77.072200",
+    "dest_node": 6458783798,
+    "dest_node_latlon": "28.459034,77.071442",
+    "dest_snap_m": 90.4
+  },
+  {
+    "id": 6,
+    "origin_name": "NH-48 (Ambience)",
+    "origin_latlon": "28.505200,77.097000",
+    "origin_node": 10989280815,
+    "origin_node_latlon": "28.504750,77.096585",
+    "origin_snap_m": 64.3,
+    "dest_name": "Cyber Hub",
+    "dest_latlon": "28.494700,77.089700",
+    "dest_node": 6618760979,
+    "dest_node_latlon": "28.494925,77.089788",
+    "dest_snap_m": 26.3
+  },
+  {
+    "id": 7,
+    "origin_name": "Manesar Rd (within extent)",
+    "origin_latlon": "28.381634,76.995104",
+    "origin_node": 9883710305,
+    "origin_node_latlon": "28.381634,76.995104",
+    "origin_snap_m": 0.0,
+    "dest_name": "NH-48 (Ambience)",
+    "dest_latlon": "28.505200,77.097000",
+    "dest_node": 10989280815,
+    "dest_node_latlon": "28.504750,77.096585",
+    "dest_snap_m": 64.3
+  }
+]

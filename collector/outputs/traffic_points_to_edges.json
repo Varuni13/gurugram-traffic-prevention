@@ -1,0 +1,135 @@
+{
+  "count": 10,
+  "mapping": [
+    {
+      "name": "IFFCO Chowk",
+      "lat": 28.4726,
+      "lon": 77.0726,
+      "speed_ratio": 0.8823529411764706,
+      "currentSpeed_kmph": 30.0,
+      "freeFlowSpeed_kmph": 34.0,
+      "edge": [
+        6112563500,
+        6112563504,
+        0
+      ]
+    },
+    {
+      "name": "MG Road",
+      "lat": 28.4795,
+      "lon": 77.0806,
+      "speed_ratio": 0.8108108108108109,
+      "currentSpeed_kmph": 30.0,
+      "freeFlowSpeed_kmph": 37.0,
+      "edge": [
+        7484460948,
+        301037151,
+        0
+      ]
+    },
+    {
+      "name": "Cyber Hub",
+      "lat": 28.4947,
+      "lon": 77.0897,
+      "speed_ratio": 0.4807692307692308,
+      "currentSpeed_kmph": 25.0,
+      "freeFlowSpeed_kmph": 52.0,
+      "edge": [
+        6618760979,
+        6618760981,
+        0
+      ]
+    },
+    {
+      "name": "Golf Course Rd",
+      "lat": 28.4503,
+      "lon": 77.0972,
+      "speed_ratio": 0.7575757575757576,
+      "currentSpeed_kmph": 25.0,
+      "freeFlowSpeed_kmph": 33.0,
+      "edge": [
+        6659991850,
+        6659991847,
+        0
+      ]
+    },
+    {
+      "name": "Sohna Road",
+      "lat": 28.4073,
+      "lon": 77.046,
+      "speed_ratio": 0.8979591836734694,
+      "currentSpeed_kmph": 44.0,
+      "freeFlowSpeed_kmph": 49.0,
+      "edge": [
+        416805956,
+        313253807,
+        0
+      ]
+    },
+    {
+      "name": "NH-48 (Ambience)",
+      "lat": 28.5052,
+      "lon": 77.097,
+      "speed_ratio": 0.631578947368421,
+      "currentSpeed_kmph": 36.0,
+      "freeFlowSpeed_kmph": 57.0,
+      "edge": [
+        1801156386,
+        1801156385,
+        0
+      ]
+    },
+    {
+      "name": "Rajiv Chowk",
+      "lat": 28.4691,
+      "lon": 77.0366,
+      "speed_ratio": 0.6896551724137931,
+      "currentSpeed_kmph": 20.0,
+      "freeFlowSpeed_kmph": 29.0,
+      "edge": [
+        7537128571,
+        2229152797,
+        0
+      ]
+    },
+    {
+      "name": "Huda City Centre",
+      "lat": 28.4595,
+      "lon": 77.0722,
+      "speed_ratio": 1.0,
+      "currentSpeed_kmph": 8.0,
+      "freeFlowSpeed_kmph": 8.0,
+      "edge": [
+        12285344991,
+        6458783265,
+        0
+      ]
+    },
+    {
+      "name": "Sector 56",
+      "lat": 28.4244,
+      "lon": 77.107,
+      "speed_ratio": 0.8181818181818182,
+      "currentSpeed_kmph": 36.0,
+      "freeFlowSpeed_kmph": 44.0,
+      "edge": [
+        3654279895,
+        3654279897,
+        0
+      ]
+    },
+    {
+      "name": "Manesar Rd",
+      "lat": 28.354,
+      "lon": 76.944,
+      "speed_ratio": 1.0,
+      "currentSpeed_kmph": 17.0,
+      "freeFlowSpeed_kmph": 17.0,
+      "edge": [
+        9883710305,
+        9883710276,
+        0
+      ]
+    }
+  ]
+}

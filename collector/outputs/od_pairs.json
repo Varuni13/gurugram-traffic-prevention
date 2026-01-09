@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "origin_name": "Cyber Hub",
+    "origin_lat": 28.4947,
+    "origin_lon": 77.0897,
+    "dest_name": "IFFCO Chowk",
+    "dest_lat": 28.4726,
+    "dest_lon": 77.0726
+  },
+  {
+    "id": 2,
+    "origin_name": "Huda City Centre",
+    "origin_lat": 28.4595,
+    "origin_lon": 77.0722,
+    "dest_name": "MG Road",
+    "dest_lat": 28.4795,
+    "dest_lon": 77.0806
+  },
+  {
+    "id": 3,
+    "origin_name": "Rajiv Chowk",
+    "origin_lat": 28.4691,
+    "origin_lon": 77.0366,
+    "dest_name": "IFFCO Chowk",
+    "dest_lat": 28.4726,
+    "dest_lon": 77.0726
+  },
+  {
+    "id": 4,
+    "origin_name": "Golf Course Rd",
+    "origin_lat": 28.4503,
+    "origin_lon": 77.0972,
+    "dest_name": "Sohna Road",
+    "dest_lat": 28.4073,
+    "dest_lon": 77.046
+  },
+  {
+    "id": 5,
+    "origin_name": "Sector 56",
+    "origin_lat": 28.4244,
+    "origin_lon": 77.107,
+    "dest_name": "Huda City Centre",
+    "dest_lat": 28.4595,
+    "dest_lon": 77.0722
+  },
+  {
+    "id": 6,
+    "origin_name": "NH-48 (Ambience)",
+    "origin_lat": 28.5052,
+    "origin_lon": 77.097,
+    "dest_name": "Cyber Hub",
+    "dest_lat": 28.4947,
+    "dest_lon": 77.0897
+  },
+  {
+    "id": 7,
+    "origin_name": "Manesar Rd (within extent)",
+    "origin_lat": 28.3816342,
+    "origin_lon": 76.9951037,
+    "dest_name": "NH-48 (Ambience)",
+    "dest_lat": 28.5052,
+    "dest_lon": 77.097
+  }
+]
