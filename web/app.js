@@ -5,7 +5,9 @@ console.log("APP.JS LOADED:", new Date().toISOString());
 ========================= */
 const API_BASE = "http://localhost:8000";
 
-const TIMES_URL = `${API_BASE}/api/times`;
+// Filter to match traffic data window: 11:25 AM to 6:17 PM (18:17)
+// Using July 13, 2025 dates from flood files but matching the time window
+const TIMES_URL = `${API_BASE}/api/times?start=2025-07-13T11:25&end=2025-07-13T18:17`;
 const FLOOD_POLY_URL = (i) => `${API_BASE}/api/flood?time=${encodeURIComponent(i)}`;
 const FLOOD_ROADS_URL = (i) => `${API_BASE}/api/flood-roads?time=${encodeURIComponent(i)}`;
 const TRAFFIC_SNAPSHOT_URL = (timeIdx = null) =>
@@ -208,16 +210,27 @@ function setFloodTimelineStatus(msg) {
 
 function setFloodTimeLabel(idx) {
   const el = document.getElementById("floodTimeLabel");
-  const elScenario = document.getElementById("scenarioFloodTime"); // New panel label
+  const elScenario = document.getElementById("scenarioFloodTime"); // Old panel label (removed from HTML but kept for safety)
+  const elSliderTime = document.getElementById("sliderCurrentTime"); // New slider time label
 
   const item = floodTimes.find((x) => Number(x.index) === Number(idx));
-  const text = item ? `Index ${item.index} • ${item.label}` : `Index ${idx}`;
+  // Simplified: Just show time for end users
+  const text = item && item.label ? item.label.split(" ")[1] || item.label : `Time ${idx}`;
 
   if (el) el.textContent = text;
 
-  // Update Scenario Panel as well
+  // Update New Slider Time Display
+  if (elSliderTime) {
+    if (item && item.label) {
+      elSliderTime.textContent = formatLabel(item.label, window.floodTimelineSpansDays);
+    } else {
+      elSliderTime.textContent = text;
+    }
+  }
+
+  // Update Scenario Panel (if it still existed)
   if (elScenario) {
-    elScenario.textContent = item ? item.label : `Index ${idx}`;
+    elScenario.textContent = elSliderTime ? elSliderTime.textContent : text;
   }
 }
 
@@ -234,16 +247,7 @@ async function loadFloodTimeline() {
 
     floodTimes = Array.isArray(data.files) ? data.files : [];
 
-    const slider = document.getElementById("floodTimeSlider");
-    if (!slider) {
-      setFloodTimelineStatus("Flood timeline: slider element not found");
-      return;
-    }
-
     if (floodTimes.length === 0) {
-      slider.min = "0";
-      slider.max = "0";
-      slider.value = "0";
       currentFloodIndex = 0;
       setFloodTimelineStatus("Flood timeline: no snapshots found");
       setFloodTimeLabel(0);
@@ -254,19 +258,67 @@ async function loadFloodTimeline() {
     const minIdx = Math.min(...indices);
     const maxIdx = Math.max(...indices);
 
-    slider.min = String(minIdx);
-    slider.max = String(maxIdx);
-    slider.value = String(minIdx);
-
     currentFloodIndex = minIdx;
     setFloodTimeLabel(currentFloodIndex);
 
-    setFloodTimelineStatus(`Flood timeline: loaded ${floodTimes.length} snapshots`);
+    // Configure slider
+    const slider = document.getElementById("floodTimeSlider");
+    if (slider) {
+      slider.min = String(minIdx);
+      slider.max = String(maxIdx);
+      slider.value = String(minIdx);
+    }
+
+    // Show time range info on slider labels
+    const firstTime = floodTimes[0]?.label || "";
+    const lastTime = floodTimes[floodTimes.length - 1]?.label || "";
+    const startLabel = document.getElementById("sliderStartTime");
+    const endLabel = document.getElementById("sliderEndTime");
+
+    // Check if dates are different
+    let showDate = false;
+    if (firstTime && lastTime) {
+      const d1 = firstTime.split(" ")[0]; // YYYY-MM-DD
+      const d2 = lastTime.split(" ")[0];
+      if (d1 !== d2) showDate = true;
+    }
+
+    // Expose this for setFloodTimeLabel to use
+    window.floodTimelineSpansDays = showDate;
+
+    if (startLabel && firstTime) {
+      // If spanning days, show "Jul 13 01:55", else "01:55"
+      startLabel.textContent = formatLabel(firstTime, showDate);
+    }
+    if (endLabel && lastTime) {
+      endLabel.textContent = formatLabel(lastTime, showDate);
+    }
+
+    // Simplified status for end users
+    setFloodTimelineStatus("✓ Data Ready");
 
     await loadFloodLayerByIndex(currentFloodIndex);
   } catch (err) {
     console.error("Error loading flood timeline:", err);
     setFloodTimelineStatus("Flood timeline: failed to load (check console /api/times)");
+  }
+}
+
+function formatLabel(fullLabel, showDate) {
+  if (!fullLabel) return "--:--";
+  if (!showDate) {
+    // Just time: "12:30"
+    return fullLabel.split(" ")[1] || fullLabel;
+  }
+  // Date + Time: "2025-07-13 12:30" -> "Jul 13, 12:30"
+  try {
+    const d = new Date(fullLabel.replace(" ", "T"));
+    const month = d.toLocaleString('en-US', { month: 'short' });
+    const day = d.getDate();
+    const time = fullLabel.split(" ")[1];
+    return `${month} ${day}, ${time}`;
+  } catch (e) {
+    return fullLabel;
   }
 }
 
@@ -301,7 +353,7 @@ async function loadFloodLayerByIndex(idx) {
       // Solid blue for ALL flooded roads
       style: {
         color: "#3b82f6",  // blue
-        weight: 6,
+        weight: 3,
         opacity: 0.8
       }
     });
@@ -328,14 +380,17 @@ async function updateTrafficSyncInfo(floodIndex) {
     const data = await res.json();
 
     if (data.matched && data.traffic_time_ist) {
-      el.textContent = `📍 Traffic synced to: ${data.traffic_time_ist} IST`;
-      el.style.color = "#16a34a";  // green
+      // Extract just TIME from traffic timestamp
+      const trafficTimeOnly = data.traffic_time_ist.split(" ")[1] || data.traffic_time_ist.split("T")[1]?.substring(0, 5) || data.traffic_time_ist;
+      // Show time only - we match by time of day, not date
+      el.textContent = trafficTimeOnly;
+      el.style.color = "#166534";
     } else {
-      el.textContent = `⚠️ Traffic: using latest snapshot`;
+      el.textContent = "No match";
       el.style.color = "#f59e0b";  // amber
     }
   } catch (err) {
-    el.textContent = `⚠️ Traffic sync info unavailable`;
+    el.textContent = "Unavailable";
     el.style.color = "#dc2626";  // red
   }
 }
@@ -937,7 +992,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const floodSlider = document.getElementById("floodTimeSlider");
 
   floodSlider?.addEventListener("input", (e) => {
-    setFloodTimeLabel(Number(e.target.value));
+    const idx = Number(e.target.value);
+    setFloodTimeLabel(idx);
+    // Also update traffic sync info while dragging slider
+    updateTrafficSyncInfo(idx);
   });
 
   floodSlider?.addEventListener("change", async (e) => {
@@ -1037,4 +1095,64 @@ window.loadFloodTimeline = loadFloodTimeline;
 window.loadFloodLayerByIndex = loadFloodLayerByIndex;
 window.calculateRouteSingle = calculateRouteSingle;
 window.clearRoutes = clearRoutes;
+
+/* =========================
+   ACCORDION TOGGLE
+========================= */
+function toggleAccordion(sectionId) {
+  const content = document.getElementById(sectionId);
+  const chevron = document.getElementById(`${sectionId}-chevron`);
+
+  if (!content || !chevron) return;
+
+  const isCollapsed = content.classList.contains('collapsed');
+
+  if (isCollapsed) {
+    // Expand
+    content.classList.remove('collapsed');
+    chevron.textContent = '▼';
+    chevron.style.transform = 'rotate(0deg)';
+  } else {
+    // Collapse
+    content.classList.add('collapsed');
+    chevron.textContent = '▶';
+    chevron.style.transform = 'rotate(-90deg)';
+  }
+}
+
+// Make it globally accessible
+window.toggleAccordion = toggleAccordion;
 window.zoomToRoutes = zoomToRoutes;
+
+/* =========================
+   INITIALIZATION - Load data when page loads
+========================= */
+console.log("[Init] Initializing dashboard...");
+
+// Load flood timeline immediately (includes setting times)
+loadFloodTimeline().then(() => {
+  console.log("[Init] Flood timeline loaded");
+
+  // Set up slider event listener after timeline is loaded
+  const slider = document.getElementById("floodTimeSlider");
+  if (slider) {
+    slider.addEventListener("input", (e) => {
+      const newIndex = Number(e.target.value);
+      setFloodTimeLabel(newIndex);
+      loadFloodLayerByIndex(newIndex);
+    });
+    console.log("[Init] Slider event listener attached");
+  }
+}).catch(err => {
+  console.error("[Init] Failed to load flood timeline:", err);
+});
+
+// Load traffic snapshot immediately
+loadTrafficSnapshot().then(() => {
+  console.log("[Init] Traffic snapshot loaded");
+}).catch(err => {
+  console.error("[Init] Failed to load traffic snapshot:", err);
+});
+
+console.log("[Init] Dashboard ready - map should be visible");
+

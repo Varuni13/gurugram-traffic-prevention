@@ -2,238 +2,258 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gurugram Flood + Traffic Dashboard</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gurugram Flood + Traffic Dashboard</title>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
-  <!-- Panel toggle button -->
-  <button id="panel-toggle" class="panel-open" title="Toggle Panel">☰</button>
+    <!-- Panel toggle button -->
+    <button id="panel-toggle" class="panel-open" title="Toggle Panel">☰</button>
 
-  <div id="control-panel">
-    <div class="title">Dashboard</div>
+    <div id="control-panel">
+        <div class="title"
+            style="display: flex; align-items: center; gap: 8px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">
+            <span style="font-size: 20px;">🗺️</span>
+            <div>
+                <div style="font-size: 16px; font-weight: 800; color: #1e293b;">Gurugram Dashboard</div>
+                <div
+                    style="font-size: 9px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Traffic & Flood Monitor</div>
+            </div>
+        </div>
 
-    <!-- Search -->
-    <div class="section-title">Search Location</div>
-    <div class="row-inline">
-      <input type="text" id="searchInput" placeholder="Enter a location" />
-      <button id="searchButton" class="btn">Search</button>
+        <!-- Search -->
+        <div class="section-title">Search Location</div>
+        <div class="row-inline">
+            <input type="input" id="searchInput" placeholder="Enter a location" />
+            <button id="searchButton" class="btn">Search</button>
+        </div>
+
+        <hr />
+
+        <!-- ACCORDION SECTION 1: Select Time (WITH INTEGRATED TIME DISPLAY) -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion('timeSection')">
+                <span class="accordion-icon">⏰</span>
+                <span class="accordion-title">Select Time</span>
+                <span class="accordion-chevron" id="timeSection-chevron">▼</span>
+            </div>
+            <div class="accordion-content" id="timeSection">
+                <!-- Enhanced Professional Time Display Card -->
+                <!-- Time Slider Control -->
+                <div style="text-align: center; margin-bottom: 8px;">
+                    <span id="sliderCurrentTime" style="font-size: 18px; font-weight: 800; color: #1e293b;">--:--</span>
+                </div>
+                <div>
+                    <input id="floodTimeSlider" type="range" min="0" max="0" step="1" value="0"
+                        style="width: 100%; height: 10px; border-radius: 5px; cursor: pointer;" />
+
+                    <!-- Time range labels -->
+                    <div
+                        style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: #64748b; font-weight: 600;">
+                        <span id="sliderStartTime">--:--</span>
+                        <span id="sliderEndTime">--:--</span>
+                    </div>
+                </div>
+
+                <!-- Timeline slider and controls removed - time shown in card above -->
+            </div>
+        </div>
+
+        <!-- ACCORDION SECTION 2: Map Layers -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion('layersSection')">
+                <span class="accordion-icon">👁️</span>
+                <span class="accordion-title">Map Layers</span>
+                <span class="accordion-chevron" id="layersSection-chevron">▼</span>
+            </div>
+            <div class="accordion-content" id="layersSection">
+                <label class="row">
+                    <input type="checkbox" id="toggleTrafficPoints" checked />
+                    <span>Traffic Status</span>
+                </label>
+
+                <label class="row">
+                    <input type="checkbox" id="toggleTraffic" />
+                    <span>Live Traffic View</span>
+                </label>
+
+                <label class="row">
+                    <input type="checkbox" id="toggleFlood" checked />
+                    <span>Flooded Roads</span>
+                </label>
+
+                <label class="row">
+                    <input type="checkbox" id="toggleRoadNetwork" />
+                    <span>All Roads</span>
+                </label>
+
+                <!-- Hidden for now - using historical data. Uncomment when live traffic access is available -->
+                <!-- <button id="refreshTrafficButton" class="btn btn-primary" style="margin-top: 10px;">🔄 Refresh Traffic
+                    Data</button> -->
+            </div>
+        </div>
+
+        <!-- ACCORDION SECTION 3: Route Options -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion('routeOptionsSection')">
+                <span class="accordion-icon">🛣️</span>
+                <span class="accordion-title">Route Options</span>
+                <span class="accordion-chevron" id="routeOptionsSection-chevron">▼</span>
+            </div>
+            <div class="accordion-content" id="routeOptionsSection">
+                <div class="route-checkboxes">
+                    <label class="row route-option">
+                        <input type="checkbox" id="routeShortest" checked />
+                        <span class="route-swatch" style="background:#8b5cf6"></span>
+                        <span>Shortest (distance)</span>
+                    </label>
+                    <label class="row route-option">
+                        <input type="checkbox" id="routeTraffic" />
+                        <span class="route-swatch" style="background:#8B4513"></span>
+                        <span>Fastest (time)</span>
+                    </label>
+                    <label class="row route-option">
+                        <input type="checkbox" id="routeFlood" />
+                        <span class="route-swatch" style="background:#006400"></span>
+                        <span>Flood-avoiding</span>
+                    </label>
+                    <label class="row route-option">
+                        <input type="checkbox" id="routeSmart" />
+                        <span class="route-swatch" style="background:#000000"></span>
+                        <span>Smart (avoid both)</span>
+                    </label>
+                </div>
+                <div class="hint" style="margin-top: 8px;">Check routes to compare. Routes calculate when origin +
+                    destination set.</div>
+
+                <!-- Route Comparison Table (inside options) -->
+                <div id="routeComparisonPanel"
+                    style="display: none; margin-top: 16px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                    <div style="font-weight: 600; margin-bottom: 6px; font-size: 12px;">📊 Route Comparison</div>
+                    <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e2e8f0; text-align: left; color: #64748b;">
+                                <th style="padding: 4px;">Type</th>
+                                <th style="padding: 4px;">Dist</th>
+                                <th style="padding: 4px;">ETA</th>
+                                <th style="padding: 4px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="routeComparisonBody">
+                            <!-- Rows will be injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCORDION SECTION 4: Route Planning -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion('routePlanningSection')">
+                <span class="accordion-icon">📌</span>
+                <span class="accordion-title">Route Planning</span>
+                <span class="accordion-chevron" id="routePlanningSection-chevron">▼</span>
+            </div>
+            <div class="accordion-content" id="routePlanningSection">
+                <!-- Quick Routes -->
+                <div style="font-weight: 600; margin-bottom: 6px; font-size: 12px;">Quick Routes</div>
+                <div class="quick-route-controls">
+                    <div class="quick-route-row">
+                        <label>From:</label>
+                        <select id="quickRouteFrom" class="quick-select">
+                            <option value="">-- Select Origin --</option>
+                            <option value="iffco">IFFCO Chowk</option>
+                            <option value="mgroad">MG Road</option>
+                            <option value="cyberhub">Cyber Hub</option>
+                            <option value="golfcourse">Golf Course Rd</option>
+                            <option value="sohna">Sohna Road</option>
+                            <option value="nh48">NH-48 (Ambience)</option>
+                            <option value="rajiv">Rajiv Chowk</option>
+                            <option value="huda">Huda City Centre</option>
+                            <option value="sector56">Sector 56</option>
+                            <option value="manesar">Manesar Rd</option>
+                        </select>
+                    </div>
+                    <div class="quick-route-row">
+                        <label>To:</label>
+                        <select id="quickRouteTo" class="quick-select">
+                            <option value="">-- Select Destination --</option>
+                            <option value="iffco">IFFCO Chowk</option>
+                            <option value="mgroad">MG Road</option>
+                            <option value="cyberhub">Cyber Hub</option>
+                            <option value="golfcourse">Golf Course Rd</option>
+                            <option value="sohna">Sohna Road</option>
+                            <option value="nh48">NH-48 (Ambience)</option>
+                            <option value="rajiv">Rajiv Chowk</option>
+                            <option value="huda">Huda City Centre</option>
+                            <option value="sector56">Sector 56</option>
+                            <option value="manesar">Manesar Rd</option>
+                        </select>
+                    </div>
+                    <button id="calculateQuickRouteBtn" class="btn btn-primary">📍 Calculate Quick Route</button>
+                    <div style="display:flex; gap:6px; margin-top:6px;">
+                        <button id="clearQuickRoutesBtn" class="clear-btn" style="flex:1;">🗑️ Clear</button>
+                        <button id="zoomToRouteBtn" class="zoom-btn" style="flex:1;">🔍 Zoom to Route</button>
+                    </div>
+                </div>
+
+                <div class="divider-text">— OR click on map —</div>
+
+                <!-- Custom Routing -->
+                <div style="font-weight: 600; margin-bottom: 6px; margin-top: 12px; font-size: 12px;">Custom (Click on
+                    Map)</div>
+                <div class="route-controls">
+                    <div class="route-row">
+                        <button id="setOriginBtn" class="route-btn origin-btn">📍 Set Origin</button>
+                        <span id="originLabel" class="coord-label">Click 'Set Origin'</span>
+                    </div>
+
+                    <div class="route-row">
+                        <button id="setDestBtn" class="route-btn dest-btn">🎯 Set Destination</button>
+                        <span id="destLabel" class="coord-label">Click 'Set Destination'</span>
+                    </div>
+
+                    <button id="clearRoutesBtn" class="clear-btn">🗑️ Clear Routes</button>
+                    <div id="routeStatus" class="route-status"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCORDION SECTION 5: Legend (Optional) -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion('legendSection')">
+                <span class="accordion-icon">📖</span>
+                <span class="accordion-title">Legend</span>
+                <span class="accordion-chevron" id="legendSection-chevron">▶</span>
+            </div>
+            <div class="accordion-content collapsed" id="legendSection">
+                <div class="legend-item">
+                    <span class="swatch" style="background: #3b82f6;"></span>
+                    <span>Flooded roads</span>
+                </div>
+                <div class="legend-item">
+                    <span class="swatch"
+                        style="background: repeating-linear-gradient(90deg, #16a34a, #16a34a 4px, transparent 4px, transparent 8px);"></span>
+                    <span>Route uses shallow flood (≤0.3m)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="swatch swatch-traffic"></span>
+                    <span>Traffic speed (green → red)</span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <hr />
+    <div id="map"></div>
 
-    <!-- Flood Time Slider -->
-    <!-- =========================================
-         NEW: SIMULATION SCENARIO PANEL
-         ========================================= -->
-    <div
-      style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
-      <div style="font-weight: 600; color: #3730a3; margin-bottom: 8px; font-size: 14px;">
-        🌟 Simulation Scenario
-      </div>
-      <div style="font-size: 13px; color: #1e1b4b; line-height: 1.6;">
-        <div>🌊 <strong>Flood:</strong> <span id="scenarioFloodTime">--</span></div>
-        <div id="trafficSyncInfo" style="color: #16a34a;">📍 <strong>Traffic:</strong> Synced to --:-- IST</div>
-      </div>
-      <div style="font-size: 11px; font-style: italic; color: #4338ca; margin-top: 8px;">
-        "Simulating flood impact during real traffic conditions"
-      </div>
-    </div>
-
-    <!-- Flood Time (Slider) -->
-    <div class="section-title">Flood Control</div>
-    <div id="floodTimelineStatus" class="hint">Flood timeline: loading…</div>
-
-    <input id="floodTimeSlider" type="range" min="0" max="0" step="1" value="0" style="width: 100%;" />
-    <div class="row-inline" style="justify-content: space-between; margin-top: 6px;">
-      <div class="hint" id="floodTimeLabel">Index 0</div>
-      <button id="reloadFloodButton" class="btn" style="padding: 2px 8px; font-size: 11px;">↻ Reload</button>
-    </div>
-
-    <!-- Traffic Coverage Bar (Visual) -->
-    <div style="margin-top: 10px; margin-bottom: 20px;">
-      <div style="font-size: 11px; color: #64748b; margin-bottom: 2px;">Traffic Data Availability:</div>
-      <div style="height: 6px; background: #e2e8f0; border-radius: 3px; position: relative; overflow: hidden;">
-        <!-- Green zone: 11:25 AM (approx 47%) to 6:17 PM (approx 76%) -->
-        <div style="position: absolute; left: 47%; width: 29%; height: 100%; background: #22c55e; opacity: 0.5;"></div>
-      </div>
-      <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-top: 2px;">
-        <span>12AM</span><span>12PM</span><span>12AM</span>
-      </div>
-    </div>
-
-    <hr />
-
-    <!-- Route Comparison Table -->
-    <div id="routeComparisonPanel" style="display: none; margin-top: 20px;">
-      <div class="section-title">📊 Route Comparison</div>
-      <table style="width: 100%; font-size: 12px; border-collapse: collapse; margin-top: 5px;">
-        <thead>
-          <tr style="border-bottom: 2px solid #e2e8f0; text-align: left; color: #64748b;">
-            <th style="padding: 4px;">Type</th>
-            <th style="padding: 4px;">Dist</th>
-            <th style="padding: 4px;">ETA</th>
-            <th style="padding: 4px;">Status</th>
-          </tr>
-        </thead>
-        <tbody id="routeComparisonBody">
-          <!-- Rows will be injected by JS -->
-        </tbody>
-      </table>
-    </div>
-
-    <hr />
-
-    <!-- Snapshot (Hidden/Minimized for cleaner look) -->
-    <!-- <div class="section-title">Traffic Snapshot</div> -->
-    <div id="snapshotStatus" class="hint" style="display:none;">Traffic snapshot: not loaded yet</div>
-    <button id="refreshTrafficButton" class="btn btn-primary" style="margin-top: 10px;">🔄 Refresh Live Traffic</button>
-
-    <hr />
-
-    <!-- Layers -->
-    <div class="section-title">Layers</div>
-    <label class="row">
-      <input type="checkbox" id="toggleTrafficPoints" checked />
-      <span>Traffic Snapshot Points</span>
-    </label>
-
-    <label class="row">
-      <input type="checkbox" id="toggleTraffic" />
-      <span>Live Traffic Tiles (needs API key)</span>
-    </label>
-
-    <label class="row">
-      <input type="checkbox" id="toggleFlood" checked />
-      <span>Flood Layer</span>
-    </label>
-
-    <label class="row">
-      <input type="checkbox" id="toggleRoadNetwork" checked />
-      <span>Road Network Overlay</span>
-    </label>
-
-    <hr />
-
-    <!-- Legend -->
-    <div class="section-title">Legend</div>
-    <div class="legend-item">
-      <span class="swatch" style="background: #3b82f6;"></span>
-      <span>Flooded roads</span>
-    </div>
-    <div class="legend-item">
-      <span class="swatch"
-        style="background: repeating-linear-gradient(90deg, #16a34a, #16a34a 4px, transparent 4px, transparent 8px);"></span>
-      <span>Route uses shallow flood (≤0.3m)</span>
-    </div>
-    <div class="legend-item">
-      <span class="swatch swatch-traffic"></span>
-      <span>Traffic speed (green → red)</span>
-    </div>
-
-    <hr />
-
-    <!-- Route Comparison Checkboxes -->
-    <div class="section-title">Route Comparison</div>
-    <div class="route-checkboxes">
-      <label class="row route-option">
-        <input type="checkbox" id="routeShortest" checked />
-        <span class="route-swatch" style="background:#8b5cf6"></span>
-        <span>Shortest (distance)</span>
-      </label>
-      <label class="row route-option">
-        <input type="checkbox" id="routeTraffic" />
-        <span class="route-swatch" style="background:#8B4513"></span>
-        <span>Traffic-avoiding (time)</span>
-      </label>
-      <label class="row route-option">
-        <input type="checkbox" id="routeFlood" />
-        <span class="route-swatch" style="background:#006400"></span>
-        <span>Flood-avoiding</span>
-      </label>
-      <label class="row route-option">
-        <input type="checkbox" id="routeSmart" />
-        <span class="route-swatch" style="background:#000000"></span>
-        <span>Smart (avoid both)</span>
-      </label>
-    </div>
-    <div class="hint">Check routes to compare. Routes calculate when origin + destination set.</div>
-
-    <hr />
-
-    <!-- Quick Routes -->
-    <div class="section-title">Quick Routes</div>
-    <div class="quick-route-controls">
-      <div class="quick-route-row">
-        <label>From:</label>
-        <select id="quickRouteFrom" class="quick-select">
-          <option value="">-- Select Origin --</option>
-          <option value="iffco">IFFCO Chowk</option>
-          <option value="mgroad">MG Road</option>
-          <option value="cyberhub">Cyber Hub</option>
-          <option value="golfcourse">Golf Course Rd</option>
-          <option value="sohna">Sohna Road</option>
-          <option value="nh48">NH-48 (Ambience)</option>
-          <option value="rajiv">Rajiv Chowk</option>
-          <option value="huda">Huda City Centre</option>
-          <option value="sector56">Sector 56</option>
-          <option value="manesar">Manesar Rd</option>
-        </select>
-      </div>
-      <div class="quick-route-row">
-        <label>To:</label>
-        <select id="quickRouteTo" class="quick-select">
-          <option value="">-- Select Destination --</option>
-          <option value="iffco">IFFCO Chowk</option>
-          <option value="mgroad">MG Road</option>
-          <option value="cyberhub">Cyber Hub</option>
-          <option value="golfcourse">Golf Course Rd</option>
-          <option value="sohna">Sohna Road</option>
-          <option value="nh48">NH-48 (Ambience)</option>
-          <option value="rajiv">Rajiv Chowk</option>
-          <option value="huda">Huda City Centre</option>
-          <option value="sector56">Sector 56</option>
-          <option value="manesar">Manesar Rd</option>
-        </select>
-      </div>
-      <button id="calculateQuickRouteBtn" class="btn btn-primary">📍 Calculate Quick Route</button>
-      <div style="display:flex; gap:6px; margin-top:6px;">
-        <button id="clearQuickRoutesBtn" class="clear-btn" style="flex:1;">🗑️ Clear</button>
-        <button id="zoomToRouteBtn" class="zoom-btn" style="flex:1;">🔍 Zoom to Route</button>
-      </div>
-    </div>
-
-    <div class="divider-text">— OR click on map —</div>
-
-    <hr />
-
-    <!-- Custom Routing -->
-    <div class="section-title">Route Planning (Custom)</div>
-
-    <div class="route-controls">
-      <div class="route-row">
-        <button id="setOriginBtn" class="route-btn origin-btn">📍 Set Origin</button>
-        <span id="originLabel" class="coord-label">Click 'Set Origin'</span>
-      </div>
-
-      <div class="route-row">
-        <button id="setDestBtn" class="route-btn dest-btn">🎯 Set Destination</button>
-        <span id="destLabel" class="coord-label">Click 'Set Destination'</span>
-      </div>
-
-      <button id="clearRoutesBtn" class="clear-btn">🗑️ Clear Routes</button>
-      <div id="routeStatus" class="route-status"></div>
-    </div>
-  </div>
-
-  <div id="map"></div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="./app.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="./app.js"></script>
 </body>
 
 </html>
