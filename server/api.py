@@ -10,6 +10,9 @@ import os
 import json
 import requests
 
+# ---- add at top-level near other caches
+_FLOOD_ROADS_CACHE: Dict[str, Dict[str, Any]] = {}  # key -> geojson dict
+
 # Optional (needed for flood->roads intersection)
 try:
     import geopandas as gpd
@@ -30,9 +33,9 @@ except Exception:
 
 # Routing import (your existing backend routing module)
 try:
-    from server.routing import find_route, get_graph_info
+    from server.routing import find_route, get_graph_info, precompute_all_flood_data, get_cache_stats
 except Exception:
-    from routing import find_route, get_graph_info
+    from routing import find_route, get_graph_info, precompute_all_flood_data, get_cache_stats
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -262,20 +265,8 @@ def api_flood_roads():
         flood_poly = flood[~flood.geometry.is_empty].copy()
         roads_ln = roads[~roads.geometry.is_empty].copy()
 
-        # Detect depth column in flood data
-        depth_col = None
-        for col in ["depth", "flood_depth", "water_depth", "wd"]:
-            if col in flood_poly.columns:
-                depth_col = col
-                break
-        
-        # Prepare flood polygons for join - include depth if available
-        flood_cols = ["geometry"]
-        if depth_col:
-            flood_cols.append(depth_col)
-        
         # geopandas sjoin uses spatial index
-        joined = gpd.sjoin(roads_ln, flood_poly[flood_cols], how="inner", predicate="intersects")
+        joined = gpd.sjoin(roads_ln, flood_poly[["geometry"]], how="inner", predicate="intersects")
 
         if joined.empty:
             return jsonify({
@@ -284,30 +275,8 @@ def api_flood_roads():
                 "properties": {"roads_file": roads_path.name, "flood_file": flood_path.name, "count": 0}
             })
 
-        # Deduplicate - keep the maximum depth for each road if multiple flood polygons
-        if depth_col and depth_col in joined.columns:
-            # Group by road and get max depth
-            joined = joined.groupby(joined.index).agg({
-                "geometry": "first",
-                depth_col: "max",
-                **{c: "first" for c in joined.columns if c not in ["geometry", depth_col, "index_right"]}
-            }).reset_index(drop=True)
-            joined = gpd.GeoDataFrame(joined, geometry="geometry", crs=roads.crs)
-            
-            # Add flood status based on depth threshold (0.3m)
-            DEPTH_THRESHOLD = 0.3
-            joined["flood_depth"] = joined[depth_col].fillna(0)
-            joined["is_passable"] = joined["flood_depth"] <= DEPTH_THRESHOLD
-            joined["flood_status"] = joined.apply(
-                lambda r: "passable" if r["flood_depth"] <= DEPTH_THRESHOLD else "dangerous", 
-                axis=1
-            )
-        else:
-            # No depth info - mark all as unknown/dangerous (conservative)
-            joined = joined.drop_duplicates()
-            joined["flood_depth"] = None
-            joined["is_passable"] = False
-            joined["flood_status"] = "unknown"
+        # Deduplicate back to unique roads
+        joined = joined.drop_duplicates(subset=[joined.index.name] if joined.index.name else None)
 
         # Add a flag
         joined["flooded"] = True
@@ -317,10 +286,7 @@ def api_flood_roads():
         out["properties"].update({
             "roads_file": roads_path.name,
             "flood_file": flood_path.name,
-            "count": len(out.get("features", [])),
-            "depth_column": depth_col,
-            "passable_count": int(joined["is_passable"].sum()) if "is_passable" in joined.columns else 0,
-            "dangerous_count": int((~joined["is_passable"]).sum()) if "is_passable" in joined.columns else len(joined)
+            "count": len(out.get("features", []))
         })
         return jsonify(out)
 
@@ -336,11 +302,8 @@ TRAFFIC_SNAPSHOTS_DIR = PROJECT_ROOT / "collector" / "outputs" / "traffic_snapsh
 
 def _find_nearest_traffic_snapshot(target_timestamp: Optional[str]) -> Optional[Path]:
     """
-    Find traffic snapshot closest to the target timestamp by TIME-OF-DAY only.
-    This allows matching flood times (July) to traffic data (January).
+    Find traffic snapshot closest to the target timestamp.
     Traffic files: traffic_YYYY-MM-DDTHH-MM-SS.json
-    
-    Returns: (snapshot_path, info_dict)
     """
     if not TRAFFIC_SNAPSHOTS_DIR.exists():
         return None
@@ -353,42 +316,30 @@ def _find_nearest_traffic_snapshot(target_timestamp: Optional[str]) -> Optional[
         # Return most recent
         return max(snapshots, key=lambda p: p.stat().st_mtime)
     
-    # Parse target timestamp to get TIME-OF-DAY only (flood timestamps are in IST)
+    # Parse target timestamp
     try:
         target_dt = datetime.fromisoformat(target_timestamp)
-        target_minutes = target_dt.hour * 60 + target_dt.minute  # Minutes since midnight (IST)
     except:
         return max(snapshots, key=lambda p: p.stat().st_mtime)
     
-    # Parse all traffic snapshot times and CONVERT UTC TO IST
-    traffic_times = []  # [(path, minutes_since_midnight_IST, datetime)]
-    for snap in snapshots:
-        try:
-            ts_str = snap.stem.replace("traffic_", "").replace("-", ":", 2).replace("-", ":")
-            ts_str = ts_str[:19]
-            ts_str = ts_str.replace(":", "-", 2)
-            snap_dt = datetime.fromisoformat(ts_str)
-            
-            # Convert UTC to IST (add 5 hours 30 minutes)
-            utc_minutes = snap_dt.hour * 60 + snap_dt.minute
-            ist_minutes = (utc_minutes + 330) % (24 * 60)  # 330 = 5*60 + 30
-            
-            traffic_times.append((snap, ist_minutes, snap_dt))
-        except:
-            continue
-    
-    if not traffic_times:
-        return max(snapshots, key=lambda p: p.stat().st_mtime)
-    
-    # Find nearest by time-of-day in IST (ignoring date)
+    # Find nearest by parsing filename timestamps
     best_match = None
     best_diff = float('inf')
     
-    for snap, snap_ist_minutes, snap_dt in traffic_times:
-        diff = abs(snap_ist_minutes - target_minutes)
-        if diff < best_diff:
-            best_diff = diff
-            best_match = snap
+    for snap in snapshots:
+        # Parse timestamp from filename: traffic_2026-01-08T12-47-09.828164+00-00.json
+        try:
+            ts_str = snap.stem.replace("traffic_", "").replace("-", ":", 2).replace("-", ":")
+            # Normalize the timestamp format
+            ts_str = ts_str[:19]  # Take YYYY:MM:DDTHH:MM:SS
+            ts_str = ts_str.replace(":", "-", 2)  # Back to YYYY-MM-DDTHH:MM:SS
+            snap_dt = datetime.fromisoformat(ts_str)
+            diff = abs((snap_dt - target_dt).total_seconds())
+            if diff < best_diff:
+                best_diff = diff
+                best_match = snap
+        except:
+            continue
     
     return best_match if best_match else max(snapshots, key=lambda p: p.stat().st_mtime)
 
@@ -433,58 +384,65 @@ def api_traffic():
 @app.route("/api/traffic/info")
 def api_traffic_info():
     """
-    Returns metadata about which traffic snapshot is being used for a given flood time.
-    GET /api/traffic/info?time=<flood_index>
+    Returns info about which traffic snapshot matches the given flood time index.
     """
     time_param = request.args.get("time")
-    timestamp_param = None
-    flood_timestamp = None
     
-    # If time (flood index) provided, get flood timestamp
-    if time_param:
-        try:
-            files = list_flood_files()
-            idx = int(time_param)
-            flood_file = next((x for x in files if x["index"] == idx), None)
-            if flood_file and flood_file.get("timestamp"):
-                timestamp_param = flood_file["timestamp"]
-                flood_timestamp = flood_file["timestamp"]
-        except:
-            pass
-    
-    # Find nearest traffic snapshot
-    nearest = _find_nearest_traffic_snapshot(timestamp_param)
+    # 1. Resolve flood time
+    flood_ts = None
+    try:
+        files = list_flood_files()
+        if files:
+            # default to 0 if not provided
+            idx = int(time_param) if time_param is not None else 0
+            match = next((x for x in files if x["index"] == idx), None)
+            if match and match.get("timestamp"):
+                flood_ts = match["timestamp"]
+    except Exception:
+        pass
+
+    # 2. Find nearest traffic
+    nearest = _find_nearest_traffic_snapshot(flood_ts)
     
     if nearest and nearest.exists():
-        # Parse traffic time from filename
+        # Parse timestamp from filename for display
+        # traffic_2026-01-08T12-47-09.828164+00-00.json
+        ts_str = "N/A"
         try:
-            ts_str = nearest.stem.replace("traffic_", "").replace("-", ":", 2).replace("-", ":")
-            ts_str = ts_str[:19]
-            ts_str = ts_str.replace(":", "-", 2)
-            snap_dt = datetime.fromisoformat(ts_str)
-            # Convert to IST (UTC+5:30)
-            ist_hour = (snap_dt.hour + 5) % 24
-            ist_minute = snap_dt.minute + 30
-            if ist_minute >= 60:
-                ist_minute -= 60
-                ist_hour = (ist_hour + 1) % 24
-            traffic_time_ist = f"{ist_hour:02d}:{ist_minute:02d}"
-            
-            return jsonify({
-                "traffic_file": nearest.name,
-                "traffic_time_ist": traffic_time_ist,
-                "flood_timestamp": flood_timestamp,
-                "flood_index": int(time_param) if time_param else None,
-                "matched": True
-            })
+            raw = nearest.stem.replace("traffic_", "").replace("-", ":", 2).replace("-", ":")
+            raw = raw[:19].replace(":", "-", 2)
+            dt = datetime.fromisoformat(raw)
+            # simplistic conversion to IST for display (UTC+5:30)
+            dt_ist = dt + timedelta(hours=5, minutes=30)
+            # Format as "HH:MM" for display
+            ts_str = dt_ist.strftime("%H:%M")
         except:
-            pass
-    
+            ts_str = nearest.name
+
+        lag = 0.0
+        if flood_ts:
+            try:
+                ft = datetime.fromisoformat(flood_ts)
+                # re-parse nearest
+                raw = nearest.stem.replace("traffic_", "").replace("-", ":", 2).replace("-", ":")
+                raw = raw[:19].replace(":", "-", 2)
+                nt = datetime.fromisoformat(raw)
+                lag = (nt - ft).total_seconds()
+            except:
+                pass
+
+        return jsonify({
+            "matched": True,
+            "traffic_file": nearest.name,
+            "traffic_time_ist": ts_str, 
+            "lag_seconds": round(lag, 1)
+        })
+
     return jsonify({
+        "matched": False,
         "traffic_file": None,
-        "traffic_time_ist": "N/A",
-        "flood_timestamp": flood_timestamp,
-        "matched": False
+        "traffic_time_ist": None, 
+        "lag_seconds": None
     })
 
 
@@ -500,7 +458,6 @@ def api_traffic_refresh():
 # TomTom proxies
 # ----------------------------
 @app.route("/api/tomtom/geocode")
-
 def api_tomtom_geocode():
     search_query = request.args.get("search", "").strip()
     if not search_query:
@@ -508,23 +465,9 @@ def api_tomtom_geocode():
     if not TOMTOM_KEY:
         return jsonify({"error": "TOMTOM_API_KEY is not set on server"}), 500
 
-    # Force search within Gurugram to avoid flying to Hyderabad etc.
-    # We append " Gurugram" if not present, and restrict to India
-    if "gurugram" not in search_query.lower() and "gurgaon" not in search_query.lower():
-        search_query += " Gurugram"
-        
     url = f"https://api.tomtom.com/search/2/geocode/{search_query}.json"
-    params = {
-        "key": TOMTOM_KEY,
-        "countrySet": "IN",
-        "limit": 5,
-        "lat": 28.4595,  # Biasing towards Gurugram center
-        "lon": 77.0266,
-        "radius": 20000  # 20km radius bias
-    }
-    
     try:
-        resp = requests.get(url, params=params, timeout=12)
+        resp = requests.get(url, params={"key": TOMTOM_KEY}, timeout=12)
         resp.raise_for_status()
         return jsonify(resp.json())
     except Exception as e:
@@ -618,12 +561,46 @@ def api_graph_info():
     return jsonify(get_graph_info())
 
 
+@app.route("/api/cache-stats")
+def api_cache_stats():
+    """Return progressive route cache statistics"""
+    return jsonify(get_cache_stats())
+
+
 @app.route("/")
 def index():
     return app.send_static_file("index.html")
 
 
+# Initialize background caching when module is imported (for gunicorn)
+import threading
+
+def _init_background_cache():
+    """Start flood data pre-computation in background thread"""
+    def background_cache():
+        print("\n[Background] Starting flood data pre-computation...")
+        try:
+            precompute_all_flood_data()
+            print("[Background] ✓ Flood cache ready!\n")
+        except Exception as e:
+            print(f"[Background] Warning: Flood pre-computation failed: {e}\n")
+    
+    # Start caching in background (daemon thread won't block app startup)
+    cache_thread = threading.Thread(target=background_cache, daemon=True)
+    cache_thread.start()
+    print("[Background] Cache initialization started in background thread")
+
+# Start background caching when app module loads
+_init_background_cache()
+
+
 if __name__ == "__main__":
-    print("\n[Starting Flask] Access at http://localhost:8000")
+    print("\n" + "="*70)
+    print("[Flask Server] Starting on development server...")
+    print("="*70)
+    print("Access at: http://localhost:8000")
+    print("Note: First route calculations may be slower while cache builds")
     print("Press Ctrl+C to stop\n")
+    
     app.run(host="0.0.0.0", port=8000, debug=False)
+
