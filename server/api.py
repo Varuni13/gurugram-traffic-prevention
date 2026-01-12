@@ -33,9 +33,9 @@ except Exception:
 
 # Routing import (your existing backend routing module)
 try:
-    from server.routing import find_route, get_graph_info, precompute_all_flood_data, get_cache_stats
+    from server.routing import find_route, get_graph_info, precompute_all_flood_data, get_cache_stats, dump_route_cache_to_disk
 except Exception:
-    from routing import find_route, get_graph_info, precompute_all_flood_data, get_cache_stats
+    from routing import find_route, get_graph_info, precompute_all_flood_data, get_cache_stats, dump_route_cache_to_disk
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -567,6 +567,29 @@ def api_cache_stats():
     return jsonify(get_cache_stats())
 
 
+@app.route("/api/debug/dump-cache")
+def api_debug_dump_cache():
+    """
+    Dumps the current in-memory route cache to a JSON file in web/data.
+    This allows manual inspection of cached routes.
+    """
+    try:
+        # Save to web/data so it's easily accessible/visible
+        output_dir = WEB_DIR / "data"
+        saved_path = dump_route_cache_to_disk(output_dir)
+        filename = Path(saved_path).name
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Cache dumped to {filename}",
+            "file_path": saved_path,
+            "url": f"/data/{filename}"  # Since web is static folder
+        })
+    except Exception as e:
+        return jsonify({"error": f"Failed to dump cache: {str(e)}"}), 500
+
+
+
 @app.route("/")
 def index():
     return app.send_static_file("index.html")
@@ -598,9 +621,8 @@ if __name__ == "__main__":
     print("\n" + "="*70)
     print("[Flask Server] Starting on development server...")
     print("="*70)
-    print("Access at: http://localhost:8000")
     print("Note: First route calculations may be slower while cache builds")
     print("Press Ctrl+C to stop\n")
     
-    app.run(host="0.0.0.0", port=8000, debug=False)
+    app.run(host="0.0.0.0", port=9110, debug=False)
 

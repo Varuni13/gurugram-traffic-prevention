@@ -3,7 +3,7 @@ console.log("APP.JS LOADED:", new Date().toISOString());
 /* =========================
    CONFIG
 ========================= */
-const API_BASE = "http://localhost:8000";
+const API_BASE = "http://localhost:9110";
 
 // Filter to match traffic data window: 11:25 AM to 6:17 PM (18:17)
 // Using July 13, 2025 dates from flood files but matching the time window
@@ -237,9 +237,13 @@ function setFloodTimeLabel(idx) {
 async function loadFloodTimeline() {
   try {
     setFloodTimelineStatus("Flood timeline: loading…");
+    console.log("[Flood Timeline] Fetching from:", TIMES_URL);
 
     const res = await fetch(TIMES_URL, { cache: "no-store" });
+    console.log("[Flood Timeline] Response status:", res.status, res.statusText);
+
     const data = await res.json();
+    console.log("[Flood Timeline] Response data:", data);
 
     if (!res.ok) {
       throw new Error(data?.error || `Times fetch failed: ${res.status}`);
@@ -299,7 +303,13 @@ async function loadFloodTimeline() {
 
     await loadFloodLayerByIndex(currentFloodIndex);
   } catch (err) {
-    console.error("Error loading flood timeline:", err);
+    console.error("=== FLOOD TIMELINE ERROR ===");
+    console.error("Error name:", err.name);
+    console.error("Error message:", err.message);
+    console.error("Full error object:", err);
+    console.error("Stack trace:", err.stack);
+    console.error("URL attempted:", TIMES_URL);
+    console.error("=============================");
     setFloodTimelineStatus("Flood timeline: failed to load (check console /api/times)");
   }
 }
@@ -410,9 +420,15 @@ async function loadTrafficSnapshot(timeIdx = null) {
   const statusEl = document.getElementById("snapshotStatus");
   try {
     if (statusEl) statusEl.textContent = "Traffic snapshot: loading...";
+    const url = TRAFFIC_SNAPSHOT_URL(timeIdx);
+    console.log("[Traffic Snapshot] Fetching from:", url);
 
-    const res = await fetch(TRAFFIC_SNAPSHOT_URL(timeIdx), { cache: "no-store" });
+    const res = await fetch(url, { cache: "no-store" });
+    console.log("[Traffic Snapshot] Response status:", res.status, res.statusText);
+
     const data = await res.json();
+    console.log("[Traffic Snapshot] Response data:", data);
+
     if (!res.ok) throw new Error(data?.error || `Traffic snapshot fetch failed: ${res.status}`);
 
     trafficSnapshot = data;
@@ -464,7 +480,13 @@ async function loadTrafficSnapshot(timeIdx = null) {
 
     console.log("✓ Traffic snapshot markers loaded:", trafficPointMarkers.length, timeIdx !== null ? `(synced to index ${timeIdx})` : "");
   } catch (err) {
-    console.error("Error loading traffic snapshot:", err);
+    console.error("=== TRAFFIC SNAPSHOT ERROR ===");
+    console.error("Error name:", err.name);
+    console.error("Error message:", err.message);
+    console.error("Full error object:", err);
+    console.error("Stack trace:", err.stack);
+    console.error("URL attempted:", TRAFFIC_SNAPSHOT_URL(timeIdx));
+    console.error("=============================");
     if (statusEl) statusEl.textContent = "Traffic snapshot: failed to load";
   }
 }
@@ -473,10 +495,20 @@ async function refreshTraffic() {
   const statusEl = document.getElementById("snapshotStatus");
   try {
     if (statusEl) statusEl.textContent = "Refreshing traffic...";
-    await fetch(`${API_BASE}/api/traffic/refresh`, { method: "POST" }).catch(() => { });
+    const refreshUrl = `${API_BASE}/api/traffic/refresh`;
+    console.log("[Refresh Traffic] Fetching from:", refreshUrl);
+
+    await fetch(refreshUrl, { method: "POST" }).catch((err) => {
+      console.error("[Refresh Traffic] POST request failed:", err);
+    });
     await loadTrafficSnapshot();
   } catch (err) {
-    console.error("Refresh traffic failed:", err);
+    console.error("=== REFRESH TRAFFIC ERROR ===");
+    console.error("Error name:", err.name);
+    console.error("Error message:", err.message);
+    console.error("Full error object:", err);
+    console.error("Stack trace:", err.stack);
+    console.error("=============================");
     if (statusEl) statusEl.textContent = "Traffic snapshot: refresh failed";
   }
 }
@@ -491,8 +523,15 @@ async function handleSearch() {
   if (!searchTerm) return alert("Please enter a location.");
 
   try {
-    const res = await fetch(`${API_BASE}/api/tomtom/geocode?search=${encodeURIComponent(searchTerm)}`);
+    const url = `${API_BASE}/api/tomtom/geocode?search=${encodeURIComponent(searchTerm)}`;
+    console.log("[Search] Fetching from:", url);
+
+    const res = await fetch(url);
+    console.log("[Search] Response status:", res.status, res.statusText);
+
     const data = await res.json();
+    console.log("[Search] Response data:", data);
+
     if (!res.ok) throw new Error(data?.error || "Failed to fetch geocode data");
 
     if (!data.results?.length) return alert("Location not found.");
@@ -505,7 +544,13 @@ async function handleSearch() {
 
     setTimeout(restoreLayerVisibility, 150);
   } catch (err) {
-    console.error("Search error:", err);
+    console.error("=== SEARCH ERROR ===");
+    console.error("Error name:", err.name);
+    console.error("Error message:", err.message);
+    console.error("Full error object:", err);
+    console.error("Stack trace:", err.stack);
+    console.error("Search term:", searchTerm);
+    console.error("====================");
     alert("Error searching location.");
   }
 }
@@ -703,15 +748,26 @@ async function fetchRoute(routeType) {
     `&flood_time=${encodeURIComponent(String(currentFloodIndex))}`;
 
   try {
+    console.log(`[Route ${routeType}] Fetching from:`, url);
     const res = await fetch(url);
+    console.log(`[Route ${routeType}] Response status:`, res.status, res.statusText);
+
     const geojson = await res.json();
+    console.log(`[Route ${routeType}] Response data:`, geojson);
+
     if (!res.ok || geojson?.error) {
       console.warn(`Route ${routeType} failed:`, geojson?.error || res.status);
       return null;
     }
     return { routeType, geojson };
   } catch (err) {
-    console.error(`Route ${routeType} error:`, err);
+    console.error(`=== ROUTE ${routeType.toUpperCase()} ERROR ===`);
+    console.error("Error name:", err.name);
+    console.error("Error message:", err.message);
+    console.error("Full error object:", err);
+    console.error("Stack trace:", err.stack);
+    console.error("URL attempted:", url);
+    console.error("=============================");
     return null;
   }
 }

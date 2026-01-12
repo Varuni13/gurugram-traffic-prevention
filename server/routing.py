@@ -1040,3 +1040,35 @@ def get_cache_stats() -> Dict[str, Any]:
         "hit_rate_percent": round(hit_rate, 2),
         "memory_efficient": len(_route_cache) < MAX_ROUTE_CACHE_SIZE
     }
+
+
+def dump_route_cache_to_disk(folder: Path) -> str:
+    """
+    Debug tool: Writes the current in-memory route cache to a JSON file.
+    """
+    if not folder.exists():
+        folder.mkdir(parents=True, exist_ok=True)
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"route_cache_dump_{timestamp}.json"
+    filepath = folder / filename
+    
+    # Convert tuple keys to strings for JSON compatibility
+    export_data = {}
+    for key, val in _route_cache.items():
+        # key is (origin_lat, origin_lon, dest_lat, dest_lon, flood_idx, route_type)
+        key_str = f"{key[0]},{key[1]}_to_{key[2]},{key[3]}_flood{key[4]}_{key[5]}"
+        export_data[key_str] = val
+        
+    info = {
+        "timestamp": timestamp,
+        "cache_size": len(_route_cache),
+        "stats": _route_cache_stats,
+        "routes": export_data
+    }
+    
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(info, f, indent=2)
+        
+    return str(filepath)
+
