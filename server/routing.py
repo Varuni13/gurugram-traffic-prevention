@@ -6,6 +6,7 @@ from typing import Dict, Any, List, Tuple, Optional, Set
 import math
 import json
 import time
+from datetime import datetime, timedelta
 
 import networkx as nx
 
@@ -56,6 +57,16 @@ _roads_geojson_path_used: Optional[Path] = None
 # Flood cache: flood_index -> set of (u,v,k) edge keys that intersect flood
 _flood_edge_cache: Dict[int, Set[Tuple[int, int, int]]] = {}
 _flood_meta_cache: Dict[int, Dict[str, Any]] = {}  # logging/meta
+
+# Traffic cache: (lat, lon) -> (u, v, k)
+_traffic_cache: Dict[Tuple[float, float], Tuple[int, int, int]] = {}
+
+# Progressive Route Cache: stores calculated routes for instant retrieval
+# Key: (origin_lat, origin_lon, dest_lat, dest_lon, flood_idx, route_type)
+# Value: route object (path coordinates, distance, time, etc.)
+_route_cache: Dict[Tuple[float, float, float, float, int, str], Dict[str, Any]] = {}
+_route_cache_stats = {"hits": 0, "misses": 0}  # Track cache effectiveness
+MAX_ROUTE_CACHE_SIZE = 500  # Prevent unlimited memory growth
 
 FLOOD_DEPTH_THRESHOLD_M = 0.3
 FLOOD_PENALTY = 1_000_000.0
@@ -317,27 +328,92 @@ def apply_traffic_data(G: nx.MultiDiGraph, traffic_points: List[Dict]) -> None:
     if not traffic_points or not OSMNX_AVAILABLE:
         return
 
-    for p in traffic_points:
+    # VECTORIZED APPROACH
+    lats = []
+    lons = []
+    speeds = []
+    valid_indices = []
+
+    for i, p in enumerate(traffic_points):
         lat = float(p.get("lat") or p.get("query_lat") or 0)
         lon = float(p.get("lon") or p.get("query_lon") or 0)
         sr = float(p.get("speed_ratio", 1.0))
         if not lat or not lon:
             continue
         sr = max(0.1, min(sr, 1.0))
+        
+        lats.append(lat)
+        lons.append(lon)
+        speeds.append(sr)
+        valid_indices.append(i)
+
+    if not lats:
+        return
+
+    # Separate cached vs new points
+    cached_indices = []
+    new_indices = []
+    new_lats = []
+    new_lons = []
+
+    for idx, (lat, lon) in enumerate(zip(lats, lons)):
+        if (lat, lon) in _traffic_cache:
+            cached_indices.append(idx)
+        else:
+            new_indices.append(idx)
+            new_lats.append(lat)
+            new_lons.append(lon)
+
+    # 1. Handle cached points
+    count_updated = 0
+    for idx in cached_indices:
+        uvk = _traffic_cache[(lats[idx], lons[idx])]
+        sr = speeds[idx]
+        
+        # update edge
+        data = G.get_edge_data(*uvk)
+        if data:
+            _update_edge_traffic(data, sr)
+            count_updated += 1
+
+    # 2. Handle new points (bulk)
+    if new_indices:
+        print(f"[Routing] computing nearest edges for {len(new_indices)} new points...")
         try:
-            u, v, k = ox.distance.nearest_edges(G, X=lon, Y=lat)
-            data = G.get_edge_data(u, v, k) or {}
-            length = float(data.get("length", 100.0))
-            ff_kph = float(data.get("free_flow_kph", DEFAULT_SPEED_KPH))
+            ne_nodes = ox.distance.nearest_edges(G, X=new_lons, Y=new_lats)
+            
+            for i, uvk in enumerate(ne_nodes):
+                # cache it
+                orig_idx = new_indices[i]
+                lat = lats[orig_idx]
+                lon = lons[orig_idx]
+                _traffic_cache[(lat, lon)] = uvk
+                
+                # update edge
+                sr = speeds[orig_idx]
+                if len(uvk) < 3: continue
+                data = G.get_edge_data(*uvk)
+                if data:
+                    _update_edge_traffic(data, sr)
+                    count_updated += 1
+                    
+        except Exception as e:
+            print(f"[Routing] Vectorized nearest_edges failed: {e}")
 
-            data["speed_ratio"] = sr
-            data["has_traffic"] = sr < 0.8
-            data["current_speed_kph"] = ff_kph * sr
+    print(f"[Routing] Updated {count_updated} edges with traffic data (cache hits: {len(cached_indices)})")
 
-            speed_mps = data["current_speed_kph"] * 1000.0 / 3600.0
-            data["travel_time"] = length / speed_mps if speed_mps > 0 else length / 8.33
-        except Exception:
-            continue
+
+def _update_edge_traffic(data: Dict, sr: float):
+    DEFAULT_SPEED_KPH = 30.0
+    length = float(data.get("length", 100.0))
+    ff_kph = float(data.get("free_flow_kph", DEFAULT_SPEED_KPH))
+
+    data["speed_ratio"] = sr
+    data["has_traffic"] = sr < 0.8
+    data["current_speed_kph"] = ff_kph * sr
+
+    speed_mps = data["current_speed_kph"] * 1000.0 / 3600.0
+    data["travel_time"] = length / speed_mps if speed_mps > 0 else length / 8.33
 
 
 # ---------------------------
@@ -509,18 +585,42 @@ def _compute_flooded_edges_set(flood_idx: int) -> Set[Tuple[int, int, int]]:
     if flood_gdf.crs != gdf_edges.crs:
         flood_gdf = flood_gdf.to_crs(gdf_edges.crs)
 
+    # OPTIMIZATION: Filter edges by total flood bounds first
+    # This prevents checking 100k edges against polygons if they are far away
+    try:
+        bounds = flood_gdf.total_bounds # [minx, miny, maxx, maxy]
+        minx, miny, maxx, maxy = bounds
+        # Use cx indexer for fast bbox filtering
+        candidates = gdf_edges.cx[minx:maxx, miny:maxy]
+    except Exception as e:
+        print(f"[Routing] BBox filter failed ({e}), using all edges")
+        candidates = gdf_edges
+
+    if candidates.empty:
+         return set()
+
     # Keep only needed columns
-    edges_geom = gdf_edges[["geometry"]].copy()
+    edges_geom = candidates[["geometry"]].copy()
 
     # Spatial join: edges that intersect flood polygons
-    joined = gpd.sjoin(edges_geom, flood_gdf[["geometry"]], how="inner", predicate="intersects")
+    joined = gpd.GeoDataFrame()
+    try:
+        joined = gpd.sjoin(edges_geom, flood_gdf[["geometry"]], how="inner", predicate="intersects")
+    except Exception as e:
+        print(f"[Routing] ERROR in sjoin: {e}")
+        return set()
 
     flooded: Set[Tuple[int, int, int]] = set()
     if not joined.empty:
         # joined index is MultiIndex (u,v,k)
         for idx in joined.index:
             try:
-                u, v, k = idx
+                # Handle cases where index might be simple or multi
+                if isinstance(idx, tuple) and len(idx) >= 3:
+                    u, v, k = idx[:3]
+                else:
+                    # sometimes reset_index might be needed if sjoin behaves differently
+                    continue
                 flooded.add((int(u), int(v), int(k)))
             except Exception:
                 continue
@@ -542,6 +642,140 @@ def _get_flooded_edges_set(flood_idx: int) -> Set[Tuple[int, int, int]]:
     flooded = _compute_flooded_edges_set(flood_idx)
     _flood_edge_cache[flood_idx] = flooded
     return flooded
+
+
+def precompute_all_flood_data():
+    """
+    Called at startup to load all flood data into memory.
+    Refined: Only loads flood files that successfully sync with available traffic data.
+    """
+    print("[Routing] specific: Pre-computing flood intersections (SYNCED with traffic)...")
+    flood_dir = PROJECT_ROOT / "web" / "data" / "GEOCODED"
+    traffic_dir = PROJECT_ROOT / "collector" / "outputs" / "traffic_snapshots"
+    
+    if not flood_dir.exists():
+        print("[Routing] No flood dir found, skipping pre-compute.")
+        return
+
+    # 1. Identify all available traffic timestamps
+    traffic_timestamps = []
+    if traffic_dir.exists():
+        for t_file in traffic_dir.glob("traffic_*.json"):
+            try:
+                # filename: traffic_2026-01-08T12-47-09.828164+00-00.json
+                # parse: 2026-01-08T12-47-09
+                ts_str = t_file.stem.replace("traffic_", "").replace("-", ":", 2).replace("-", ":")
+                ts_str = ts_str[:19].replace(":", "-", 2)
+                dt = datetime.fromisoformat(ts_str)
+                traffic_timestamps.append(dt)
+            except Exception:
+                continue
+    
+    print(f"[Routing] Found {len(traffic_timestamps)} traffic snapshots.")
+    
+    flood_files = sorted(flood_dir.glob("D*.geojson"))
+    print(f"[Routing] Found {len(flood_files)} potential flood files.")
+    
+    # Ensure graph & gdf_edges loaded
+    load_graph()
+    if OSMNX_AVAILABLE:
+        _ensure_gdf_edges()
+
+    cached_count = 0
+    skipped_count = 0
+
+    for i, f_file in enumerate(flood_files):
+        # 2. Find the NEAREST PREVIOUS traffic snapshot BY TIME OF DAY (ignoring date)
+        should_cache = False
+        matched_traffic = None
+        
+        try:
+            # filename: D202601081230.geojson
+            stem = f_file.stem
+            if stem.startswith("D"):
+                s = stem[1:13] # YYYYMMDDHHMM
+                flood_dt = datetime.strptime(s, "%Y%m%d%H%M")
+                
+                # Extract TIME only (hour, minute) for matching
+                flood_time = flood_dt.time()  # Just HH:MM:SS
+                
+                if traffic_timestamps:
+                    # CRITICAL: Traffic timestamps are in UTC, flood filenames are in IST
+                    # Convert traffic to IST (+5:30) before comparing
+                    ist_offset = timedelta(hours=5, minutes=30)
+                    traffic_times_ist = [(t, (t + ist_offset).time()) for t in traffic_timestamps]
+                    
+                    # Get the min and max traffic times (in IST) for range checking
+                    min_traffic_time = min(tm for (dt, tm) in traffic_times_ist)
+                    max_traffic_time = max(tm for (dt, tm) in traffic_times_ist)
+                    
+                    # Skip flood data that's outside the traffic time range
+                    # Allow 30 minutes before/after for matching flexibility
+                    flood_seconds = flood_time.hour * 3600 + flood_time.minute * 60
+                    min_traffic_seconds = min_traffic_time.hour * 3600 + min_traffic_time.minute * 60 - 1800  # -30 min
+                    max_traffic_seconds = max_traffic_time.hour * 3600 + max_traffic_time.minute * 60 + 1800  # +30 min
+                    
+                    if flood_seconds < min_traffic_seconds or flood_seconds > max_traffic_seconds:
+                        print(f"[Routing] ✗ Skipping Flood {flood_time.strftime('%H:%M')} (outside traffic window {min_traffic_time.strftime('%H:%M')} IST - {max_traffic_time.strftime('%H:%M')} IST)")
+                        # Don't cache - outside traffic range
+                        continue
+                    
+                    # Find nearest PREVIOUS traffic by time of day (both in IST now)
+                    previous_snapshots = [(dt, tm) for (dt, tm) in traffic_times_ist if tm <= flood_time]
+                    
+                    if previous_snapshots:
+                        # Pick the CLOSEST previous one by time
+                        matched_traffic_tuple = max(previous_snapshots, key=lambda x: x[1])
+                        matched_traffic = matched_traffic_tuple[0]
+                        matched_time = matched_traffic_tuple[1]
+                        
+                        # Calculate time difference (in seconds, ignoring date)
+                        flood_seconds = flood_time.hour * 3600 + flood_time.minute * 60 + flood_time.second
+                        traffic_seconds = matched_time.hour * 3600 + matched_time.minute * 60 + matched_time.second
+                        diff_seconds = abs(flood_seconds - traffic_seconds)
+                        
+                        # Only match if within reasonable window (e.g., 2 hours)
+                        if diff_seconds <= 7200:  # 2 hours = 7200 seconds
+                            should_cache = True
+                            # Show TIMES ONLY in IST for clarity
+                            print(f"[Routing] ✓ Flood {flood_time.strftime('%H:%M')} IST → Traffic {matched_time.strftime('%H:%M')} IST (diff: {int(diff_seconds/60)}min)")
+                        else:
+                            print(f"[Routing] ✗ Flood {flood_time.strftime('%H:%M')} IST too far from nearest traffic (>{int(diff_seconds/60)}min)")
+                    else:
+                        # No previous traffic by time, try next one as fallback
+                        future_snapshots = [(dt, tm) for (dt, tm) in traffic_times_ist if tm > flood_time]
+                        if future_snapshots:
+                            matched_traffic_tuple = min(future_snapshots, key=lambda x: x[1])
+                            matched_traffic = matched_traffic_tuple[0]
+                            matched_time = matched_traffic_tuple[1]
+                            
+                            flood_seconds = flood_time.hour * 3600 + flood_time.minute * 60 + flood_time.second
+                            traffic_seconds = matched_time.hour * 3600 + matched_time.minute * 60 + matched_time.second
+                            diff_seconds = abs(flood_seconds - traffic_seconds)
+                            
+                            if diff_seconds <= 7200:
+                                should_cache = True
+                                print(f"[Routing] ⚠️ Flood {flood_time.strftime('%H:%M')} IST → Traffic {matched_time.strftime('%H:%M')} IST (next: {int(diff_seconds/60)}min, no prev available)")
+                        else:
+                            print(f"[Routing] ✗ Flood {flood_time.strftime('%H:%M')} IST has no nearby traffic data")
+                else:
+                    print(f"[Routing] ✗ No traffic snapshots available")
+                    
+        except Exception as e:
+            print(f"[Routing] Failed to parse flood timestamp from {f_file.name}: {e}")
+            
+        # FALLBACK: Cache index 0 only if NO other files were cached yet
+        if i == 0 and not should_cache and cached_count == 0:
+            print(f"[Routing] ⚠️ WARNING: Caching index 0 as fallback (NO traffic match!)")
+            should_cache = True
+
+        if should_cache:
+            _get_flooded_edges_set(i)
+            cached_count += 1
+        else:
+            skipped_count += 1
+        
+    print(f"[Routing] Pre-computation complete. Cached {cached_count} timestamps (Skipped {skipped_count} unmatched).")
 
 
 def _apply_flood_costs(G: nx.MultiDiGraph, flooded_edges: Set[Tuple[int, int, int]]) -> None:
@@ -591,6 +825,33 @@ def find_route(
       - flood_avoid:  minimize flood_cost (length + penalty on flooded)
       - smart:        minimize smart_cost (travel_time + penalty on flooded)
     """
+    # PROGRESSIVE CACHE: Check if we've calculated this exact route before
+    try:
+        flood_idx = int(flood_time) if flood_time is not None else 0
+    except Exception:
+        flood_idx = 0
+    
+    # Create cache key (round coords to avoid float precision issues)
+    cache_key = (
+        round(origin_lat, 5),
+        round(origin_lon, 5),
+        round(dest_lat, 5),
+        round(dest_lon, 5),
+        flood_idx,
+        route_type
+    )
+    
+    # Check cache first
+    if cache_key in _route_cache:
+        _route_cache_stats["hits"] += 1
+        hit_rate = (_route_cache_stats["hits"] / (_route_cache_stats["hits"] + _route_cache_stats["misses"])) * 100
+        print(f"[Cache HIT] Returning cached route (hit rate: {hit_rate:.1f}%, cache size: {len(_route_cache)})")
+        return _route_cache[cache_key]
+    
+    # Cache MISS - calculate the route
+    _route_cache_stats["misses"] += 1
+    print(f"[Cache MISS] Calculating new route (cache size: {len(_route_cache)})")
+    
     t_start = time.perf_counter()
     G = load_graph()
 
@@ -731,7 +992,20 @@ def find_route(
         }
         features.append(flooded_feature)
 
-    return {"type": "FeatureCollection", "features": features, "properties": props}
+    result = {"type": "FeatureCollection", "features": features, "properties": props}
+    
+    # PROGRESSIVE CACHE: Store this result for future requests
+    # Implement simple LRU: if cache full, remove oldest entry (first inserted)
+    if len(_route_cache) >= MAX_ROUTE_CACHE_SIZE:
+        # Remove the first (oldest) item
+        oldest_key = next(iter(_route_cache))
+        del _route_cache[oldest_key]
+        print(f"[Cache] Evicted oldest entry (cache at max size: {MAX_ROUTE_CACHE_SIZE})")
+    
+    _route_cache[cache_key] = result
+    print(f"[Cache] Stored new route (cache size: {len(_route_cache)})")
+    
+    return result
 
 
 def get_graph_info() -> Dict[str, Any]:
@@ -750,3 +1024,19 @@ def get_graph_info() -> Dict[str, Any]:
         }
     except Exception as e:
         return {"loaded": False, "error": str(e)}
+
+
+def get_cache_stats() -> Dict[str, Any]:
+    """Return progressive route cache statistics"""
+    total_requests = _route_cache_stats["hits"] + _route_cache_stats["misses"]
+    hit_rate = (_route_cache_stats["hits"] / total_requests * 100) if total_requests > 0 else 0.0
+    
+    return {
+        "cache_size": len(_route_cache),
+        "max_size": MAX_ROUTE_CACHE_SIZE,
+        "hits": _route_cache_stats["hits"],
+        "misses": _route_cache_stats["misses"],
+        "total_requests": total_requests,
+        "hit_rate_percent": round(hit_rate, 2),
+        "memory_efficient": len(_route_cache) < MAX_ROUTE_CACHE_SIZE
+    }

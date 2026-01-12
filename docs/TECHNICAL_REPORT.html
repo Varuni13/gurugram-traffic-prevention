@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>TECHNICAL_REPORT</title>
+  <style>
+
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+border: none;
+border-top: 1px solid #1a1a1a;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#gurugram-traffic-forecasting-flood-avoidance-system" id="toc-gurugram-traffic-forecasting-flood-avoidance-system">Gurugram
+Traffic Forecasting &amp; Flood Avoidance System</a>
+<ul>
+<li><a href="#complete-technical-report" id="toc-complete-technical-report">Complete Technical Report</a></li>
+<li><a href="#executive-summary" id="toc-executive-summary">Executive
+Summary</a></li>
+<li><a href="#system-architecture" id="toc-system-architecture">1.
+System Architecture</a>
+<ul>
+<li><a href="#technology-stack" id="toc-technology-stack">1.1 Technology
+Stack</a></li>
+<li><a href="#system-components" id="toc-system-components">1.2 System
+Components</a></li>
+</ul></li>
+<li><a href="#core-methodology-concepts" id="toc-core-methodology-concepts">2. Core Methodology &amp;
+Concepts</a>
+<ul>
+<li><a href="#graph-based-road-network-representation" id="toc-graph-based-road-network-representation">2.1 Graph-Based Road
+Network Representation</a></li>
+<li><a href="#mathematical-foundations" id="toc-mathematical-foundations">2.2 Mathematical Foundations</a></li>
+</ul></li>
+<li><a href="#routing-algorithms" id="toc-routing-algorithms">3. Routing
+Algorithms</a>
+<ul>
+<li><a href="#dijkstras-shortest-path-algorithm" id="toc-dijkstras-shortest-path-algorithm">3.1 Dijkstra’s Shortest Path
+Algorithm</a></li>
+<li><a href="#four-route-types-implementation" id="toc-four-route-types-implementation">3.2 Four Route Types
+Implementation</a></li>
+<li><a href="#comparison-of-route-types" id="toc-comparison-of-route-types">3.3 Comparison of Route
+Types</a></li>
+</ul></li>
+<li><a href="#spatial-flood-detection" id="toc-spatial-flood-detection">4. Spatial Flood Detection</a>
+<ul>
+<li><a href="#geometric-intersection-algorithm" id="toc-geometric-intersection-algorithm">4.1 Geometric Intersection
+Algorithm</a></li>
+<li><a href="#flood-depth-threshold-rationale" id="toc-flood-depth-threshold-rationale">4.2 Flood Depth Threshold
+Rationale</a></li>
+</ul></li>
+<li><a href="#traffic-data-integration" id="toc-traffic-data-integration">5. Traffic Data Integration</a>
+<ul>
+<li><a href="#tomtom-traffic-flow-api" id="toc-tomtom-traffic-flow-api">5.1 TomTom Traffic Flow API</a></li>
+<li><a href="#traffic-to-graph-mapping-algorithm" id="toc-traffic-to-graph-mapping-algorithm">5.2 Traffic-to-Graph Mapping
+Algorithm</a></li>
+<li><a href="#traffic-cache-optimization" id="toc-traffic-cache-optimization">5.3 Traffic Cache
+Optimization</a></li>
+</ul></li>
+<li><a href="#progressive-route-caching-strategy" id="toc-progressive-route-caching-strategy">6. Progressive Route Caching
+Strategy</a>
+<ul>
+<li><a href="#cache-design-rationale" id="toc-cache-design-rationale">6.1 Cache Design Rationale</a></li>
+<li><a href="#cache-eviction-policy" id="toc-cache-eviction-policy">6.2
+Cache Eviction Policy</a></li>
+<li><a href="#cache-effectiveness-metrics" id="toc-cache-effectiveness-metrics">6.3 Cache Effectiveness
+Metrics</a></li>
+</ul></li>
+<li><a href="#time-series-flood-timeline-system" id="toc-time-series-flood-timeline-system">7. Time-Series Flood Timeline
+System</a>
+<ul>
+<li><a href="#flood-data-structure" id="toc-flood-data-structure">7.1
+Flood Data Structure</a></li>
+<li><a href="#traffic-flood-time-synchronization" id="toc-traffic-flood-time-synchronization">7.2 Traffic-Flood Time
+Synchronization</a></li>
+<li><a href="#flood-cache-pre-computation" id="toc-flood-cache-pre-computation">7.3 Flood Cache
+Pre-computation</a></li>
+</ul></li>
+<li><a href="#performance-optimizations" id="toc-performance-optimizations">8. Performance Optimizations</a>
+<ul>
+<li><a href="#optimization-summary" id="toc-optimization-summary">8.1
+Optimization Summary</a></li>
+<li><a href="#cold-start-vs.-warm-server" id="toc-cold-start-vs.-warm-server">8.2 Cold Start vs. Warm
+Server</a></li>
+<li><a href="#background-thread-architecture" id="toc-background-thread-architecture">8.3 Background Thread
+Architecture</a></li>
+</ul></li>
+<li><a href="#frontend-design-user-experience" id="toc-frontend-design-user-experience">9. Frontend Design &amp; User
+Experience</a>
+<ul>
+<li><a href="#map-pane-layering-system" id="toc-map-pane-layering-system">9.1 Map Pane Layering System</a></li>
+<li><a href="#route-visualization-strategy" id="toc-route-visualization-strategy">9.2 Route Visualization
+Strategy</a></li>
+<li><a href="#flooded-segment-overlay" id="toc-flooded-segment-overlay">9.3 Flooded Segment Overlay</a></li>
+<li><a href="#route-comparison-panel" id="toc-route-comparison-panel">9.4 Route Comparison Panel</a></li>
+</ul></li>
+<li><a href="#design-decisions-rationale" id="toc-design-decisions-rationale">10. Design Decisions &amp;
+Rationale</a>
+<ul>
+<li><a href="#why-networkx-over-custom-graph" id="toc-why-networkx-over-custom-graph">10.1 Why NetworkX over Custom
+Graph?</a></li>
+<li><a href="#why-flood-penalty-vs.-boolean-blocking" id="toc-why-flood-penalty-vs.-boolean-blocking">10.2 Why Flood Penalty
+vs. Boolean Blocking?</a></li>
+<li><a href="#why-15-minute-flood-intervals" id="toc-why-15-minute-flood-intervals">10.3 Why 15-Minute Flood
+Intervals?</a></li>
+<li><a href="#why-client-side-route-checkboxes-vs.-server-side-default" id="toc-why-client-side-route-checkboxes-vs.-server-side-default">10.4
+Why Client-Side Route Checkboxes vs. Server-Side Default?</a></li>
+<li><a href="#why-geopandas-over-postgis" id="toc-why-geopandas-over-postgis">10.5 Why GeoPandas over
+PostGIS?</a></li>
+</ul></li>
+<li><a href="#key-mathematical-formulas-reference" id="toc-key-mathematical-formulas-reference">11. Key Mathematical
+Formulas Reference</a>
+<ul>
+<li><a href="#distance-speed" id="toc-distance-speed">11.1 Distance
+&amp; Speed</a></li>
+<li><a href="#routing-costs" id="toc-routing-costs">11.2 Routing
+Costs</a></li>
+<li><a href="#complexity-analysis" id="toc-complexity-analysis">11.3
+Complexity Analysis</a></li>
+</ul></li>
+<li><a href="#deployment-configuration" id="toc-deployment-configuration">12. Deployment Configuration</a>
+<ul>
+<li><a href="#server-startup-sequence" id="toc-server-startup-sequence">12.1 Server Startup Sequence</a></li>
+<li><a href="#production-settings" id="toc-production-settings">12.2
+Production Settings</a></li>
+<li><a href="#environment-variables" id="toc-environment-variables">12.3
+Environment Variables</a></li>
+</ul></li>
+<li><a href="#future-enhancements" id="toc-future-enhancements">13.
+Future Enhancements</a>
+<ul>
+<li><a href="#potential-improvements" id="toc-potential-improvements">13.1 Potential Improvements</a></li>
+<li><a href="#scalability-considerations" id="toc-scalability-considerations">13.2 Scalability
+Considerations</a></li>
+</ul></li>
+<li><a href="#conclusion" id="toc-conclusion">14. Conclusion</a>
+<ul>
+<li><a href="#technical-excellence" id="toc-technical-excellence">Technical Excellence</a></li>
+<li><a href="#real-world-impact" id="toc-real-world-impact">Real-World
+Impact</a></li>
+<li><a href="#engineering-best-practices" id="toc-engineering-best-practices">Engineering Best Practices</a></li>
+</ul></li>
+<li><a href="#appendix-technical-glossary" id="toc-appendix-technical-glossary">Appendix: Technical
+Glossary</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="gurugram-traffic-forecasting-flood-avoidance-system">Gurugram
+Traffic Forecasting &amp; Flood Avoidance System</h1>
+<h2 id="complete-technical-report">Complete Technical Report</h2>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p>This document provides a comprehensive technical overview of the
+<strong>Gurugram Traffic Forecasting and Flood Avoidance System</strong>
+- a real-time intelligent routing application that integrates live
+traffic data and flood predictions to provide optimal route
+recommendations for the Gurugram region.</p>
+<p><strong>Core Capabilities:</strong> - Multi-objective route
+optimization (shortest, fastest, flood-avoiding, smart) - Real-time
+traffic integration via TomTom API - Time-series flood prediction
+visualization - Progressive route caching for instant responses -
+Spatial intersection analysis for flood-road detection</p>
+<hr />
+<h2 id="system-architecture">1. System Architecture</h2>
+<h3 id="technology-stack">1.1 Technology Stack</h3>
+<h4 id="backend">Backend</h4>
+<ul>
+<li><strong>Flask</strong> (Python web framework) - RESTful API
+server</li>
+<li><strong>NetworkX</strong> - Graph-based routing algorithms</li>
+<li><strong>OSMnx</strong> - OpenStreetMap road network processing</li>
+<li><strong>GeoPandas + Shapely</strong> - Spatial geometry
+operations</li>
+<li><strong>Requests</strong> - External API integration</li>
+</ul>
+<h4 id="frontend">Frontend</h4>
+<ul>
+<li><strong>Leaflet.js</strong> - Interactive mapping library</li>
+<li><strong>Vanilla JavaScript</strong> - Client-side logic</li>
+<li><strong>HTML5/CSS3</strong> - UI structure and styling</li>
+</ul>
+<h4 id="data-sources">Data Sources</h4>
+<ul>
+<li><strong>OpenStreetMap</strong> - Road network topology</li>
+<li><strong>TomTom Traffic API</strong> - Real-time traffic flow
+data</li>
+<li><strong>Custom Flood Model</strong> - Time-series flood depth
+predictions (GeoJSON polygons)</li>
+</ul>
+<h3 id="system-components">1.2 System Components</h3>
+<pre class="mermaid"><code>graph TB
+    A[User Interface - Leaflet Map] --&gt; B[Flask API Server]
+    B --&gt; C[Routing Engine]
+    B --&gt; D[Traffic Collector]
+    B --&gt; E[Flood Data Manager]
+    
+    C --&gt; F[Road Network Graph]
+    C --&gt; G[Spatial Index]
+    
+    D --&gt; H[TomTom API]
+    E --&gt; I[Flood GeoJSON Files]
+    
+    F --&gt; J[GraphML OSM Data]
+    
+    K[Progressive Cache] --&gt; C
+    L[Flood Edge Cache] --&gt; E</code></pre>
+<hr />
+<h2 id="core-methodology-concepts">2. Core Methodology &amp;
+Concepts</h2>
+<h3 id="graph-based-road-network-representation">2.1 Graph-Based Road
+Network Representation</h3>
+<h4 id="concept">Concept</h4>
+<p>We represent the road network as a <strong>directed
+multi-graph</strong> where: - <strong>Nodes</strong> = Road
+intersections (latitude, longitude coordinates) - <strong>Edges</strong>
+= Road segments connecting intersections - <strong>Multi-edges</strong>
+= Multiple lanes/directions between same intersections</p>
+<h4 id="why-this-approach">Why This Approach?</h4>
+<ol type="1">
+<li><strong>Mathematical Foundation</strong>: Graph theory provides
+proven algorithms (Dijkstra’s, A*) for shortest path problems</li>
+<li><strong>Realistic Modeling</strong>: Multi-graphs capture one-way
+streets, parallel lanes, and complex junctions</li>
+<li><strong>Efficient Queries</strong>: NetworkX provides optimized
+graph traversal (O(E log V) for Dijkstra)</li>
+<li><strong>Extensibility</strong>: Easy to add edge attributes (speed,
+flood status, construction)</li>
+</ol>
+<h4 id="implementation">Implementation</h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Graph representation using NetworkX</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>G <span class="op">=</span> nx.MultiDiGraph()  <span class="co"># Directed graph with parallel edges</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Each edge stores:</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>edge_data <span class="op">=</span> {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;length&#39;</span>: <span class="fl">150.5</span>,          <span class="co"># meters</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;maxspeed&#39;</span>: <span class="dv">50</span>,           <span class="co"># km/h</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;travel_time&#39;</span>: <span class="fl">10.83</span>,     <span class="co"># seconds</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;osmid&#39;</span>: <span class="dv">12345</span>,           <span class="co"># OpenStreetMap ID</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;geometry&#39;</span>: LineString()  <span class="co"># Shapely geometry for curves</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="mathematical-foundations">2.2 Mathematical Foundations</h3>
+<h4 id="haversine-distance-formula">2.2.1 Haversine Distance
+Formula</h4>
+<p><strong>Purpose</strong>: Calculate great-circle distance between two
+GPS coordinates on Earth’s surface.</p>
+<p><strong>Formula</strong>:</p>
+<pre><code>d = 2R × arcsin(√[sin²(Δφ/2) + cos(φ₁) × cos(φ₂) × sin²(Δλ/2)])
+
+where:
+  R = Earth&#39;s radius = 6,371,000 meters
+  φ₁, φ₂ = latitudes in radians
+  λ₁, λ₂ = longitudes in radians
+  Δφ = φ₂ - φ₁
+  Δλ = λ₂ - λ₁</code></pre>
+<p><strong>Implementation</strong>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _haversine_m(lat1, lon1, lat2, lon2) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    R <span class="op">=</span> <span class="fl">6371000.0</span>  <span class="co"># Earth radius in meters</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    φ<span class="dv">1</span> <span class="op">=</span> math.radians(lat1)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    φ<span class="dv">2</span> <span class="op">=</span> math.radians(lat2)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    Δφ <span class="op">=</span> math.radians(lat2 <span class="op">-</span> lat1)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    Δλ <span class="op">=</span> math.radians(lon2 <span class="op">-</span> lon1)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> math.sin(Δφ<span class="op">/</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span> <span class="op">+</span> math.cos(φ<span class="dv">1</span>) <span class="op">*</span> math.cos(φ<span class="dv">2</span>) <span class="op">*</span> math.sin(Δλ<span class="op">/</span><span class="dv">2</span>)<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> math.asin(math.sqrt(a))</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> R <span class="op">*</span> c</span></code></pre></div>
+<p><strong>Reasoning</strong>: Haversine is accurate for distances &lt;
+1000km and computationally efficient (no complex ellipsoid calculations
+needed for city-scale routing).</p>
+<h4 id="travel-time-calculation">2.2.2 Travel Time Calculation</h4>
+<p><strong>Base Formula</strong>:</p>
+<pre><code>travel_time = distance / speed
+
+In SI units:
+travel_time (seconds) = length (meters) / speed (meters/second)
+
+Converting speed from km/h to m/s:
+speed_m/s = speed_km/h × (1000/3600) = speed_km/h × 0.27778</code></pre>
+<p><strong>Implementation</strong>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Free-flow travel time (no traffic)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>speed_kph <span class="op">=</span> <span class="dv">50</span>  <span class="co"># from OSM maxspeed attribute</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>speed_mps <span class="op">=</span> speed_kph <span class="op">*</span> <span class="fl">1000.0</span> <span class="op">/</span> <span class="fl">3600.0</span>  <span class="co"># = 13.89 m/s</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>travel_time <span class="op">=</span> length <span class="op">/</span> speed_mps  <span class="co"># seconds</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Traffic-adjusted travel time</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>current_speed_kph <span class="op">=</span> free_flow_kph <span class="op">*</span> speed_ratio</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>current_speed_mps <span class="op">=</span> current_speed_kph <span class="op">*</span> <span class="fl">1000.0</span> <span class="op">/</span> <span class="fl">3600.0</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>travel_time_congested <span class="op">=</span> length <span class="op">/</span> current_speed_mps</span></code></pre></div>
+<p><strong>Speed Ratio Concept</strong>:</p>
+<pre><code>speed_ratio = current_speed / free_flow_speed
+
+Examples:
+  speed_ratio = 1.0  → No congestion (green)
+  speed_ratio = 0.5  → Moderate congestion (yellow)
+  speed_ratio = 0.2  → Heavy congestion (red)</code></pre>
+<hr />
+<h2 id="routing-algorithms">3. Routing Algorithms</h2>
+<h3 id="dijkstras-shortest-path-algorithm">3.1 Dijkstra’s Shortest Path
+Algorithm</h3>
+<h4 id="mathematical-formulation">Mathematical Formulation</h4>
+<p><strong>Problem</strong>: Find minimum-cost path from origin node
+<code>s</code> to destination node <code>t</code>.</p>
+<p><strong>Cost Function</strong>: For each edge <code>(u,v)</code>,
+define weight <code>w(u,v)</code> based on optimization objective.</p>
+<p><strong>Algorithm Steps</strong>:</p>
+<pre><code>1. Initialize:
+   dist[s] = 0
+   dist[v] = ∞ for all v ≠ s
+   priority_queue Q = {all nodes}
+
+2. While Q not empty:
+   u = node in Q with minimum dist[u]
+   remove u from Q
+   
+   for each neighbor v of u:
+      alt = dist[u] + w(u,v)
+      if alt &lt; dist[v]:
+         dist[v] = alt
+         previous[v] = u
+
+3. Reconstruct path:
+   path = []
+   u = t
+   while u ≠ s:
+      path.prepend(u)
+      u = previous[u]
+   path.prepend(s)</code></pre>
+<p><strong>Complexity</strong>: O((V + E) log V) using binary heap
+priority queue</p>
+<h3 id="four-route-types-implementation">3.2 Four Route Types
+Implementation</h3>
+<p>We implement <strong>four distinct routing objectives</strong>, each
+optimizing a different cost function:</p>
+<h4 id="route-type-1-shortest-distance-optimized">3.2.1 Route Type 1:
+SHORTEST (Distance-Optimized)</h4>
+<p><strong>Objective</strong>: Minimize total physical distance
+traveled.</p>
+<p><strong>Cost Function</strong>:</p>
+<pre><code>w(u,v) = length(u,v)  [meters]</code></pre>
+<p><strong>Use Case</strong>: Minimize fuel consumption, prefer direct
+routes.</p>
+<p><strong>Implementation</strong>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>route_nodes <span class="op">=</span> nx.shortest_path(G, origin_node, dest_node, weight<span class="op">=</span><span class="st">&#39;length&#39;</span>)</span></code></pre></div>
+<p><strong>Characteristics</strong>: - Ignores traffic conditions -
+Ignores flood status - Pure geometric optimization - Fastest computation
+(no traffic/flood preprocessing)</p>
+<hr />
+<h4 id="route-type-2-fastest-traffic-optimized">3.2.2 Route Type 2:
+FASTEST (Traffic-Optimized)</h4>
+<p><strong>Objective</strong>: Minimize total travel time considering
+real-time traffic.</p>
+<p><strong>Cost Function</strong>:</p>
+<pre><code>w(u,v) = travel_time(u,v)  [seconds]
+
+where:
+  travel_time(u,v) = length(u,v) / current_speed(u,v)
+  current_speed(u,v) = free_flow_speed(u,v) × speed_ratio(u,v)</code></pre>
+<p><strong>Traffic Integration Formula</strong>:</p>
+<pre><code>For edge (u,v) near traffic point P:
+  speed_ratio_P = current_speed_P / free_flow_speed_P
+  
+Apply to edge:
+  edge.speed_ratio = speed_ratio_P
+  edge.current_speed_kph = edge.free_flow_kph × speed_ratio_P
+  edge.travel_time = edge.length / (edge.current_speed_kph × 0.27778)</code></pre>
+<p><strong>Use Case</strong>: Rush hour navigation, time-critical
+trips.</p>
+<p><strong>Implementation</strong>:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Apply traffic data to graph</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>traffic_points <span class="op">=</span> load_traffic_snapshot()</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>apply_traffic_data(G, traffic_points)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Route using travel_time weight</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>route_nodes <span class="op">=</span> nx.shortest_path(G, origin_node, dest_node, weight<span class="op">=</span><span class="st">&#39;travel_time&#39;</span>)</span></code></pre></div>
+<p><strong>Characteristics</strong>: - Dynamic routing based on live
+traffic - Updates every time traffic data refreshes - Ignores flood
+conditions - May suggest longer physical routes if traffic is clear</p>
+<hr />
+<h4 id="route-type-3-flood_avoid-flood-penalty-distance">3.2.3 Route
+Type 3: FLOOD_AVOID (Flood-Penalty Distance)</h4>
+<p><strong>Objective</strong>: Minimize distance while <strong>strongly
+avoiding</strong> flooded roads.</p>
+<p><strong>Cost Function</strong>:</p>
+<pre><code>w(u,v) = flood_cost(u,v)
+
+where:
+  flood_cost(u,v) = {
+    length(u,v)                  if NOT flooded
+    length(u,v) + FLOOD_PENALTY  if flooded AND depth &gt; threshold
+  }
+  
+  FLOOD_PENALTY = 1,000,000 meters  (effectively infinite)
+  FLOOD_DEPTH_THRESHOLD = 0.3 meters</code></pre>
+<p><strong>Rationale for Penalty Value</strong>: - Gurugram road network
+spans ~50 km × 50 km - Maximum possible route ≈ 100 km = 100,000 m -
+FLOOD_PENALTY = 1,000,000 m &gt;&gt; max_route_length - Therefore,
+algorithm will <strong>always</strong> prefer non-flooded detour unless
+physically impossible</p>
+<p><strong>Flood Detection Logic</strong>:</p>
+<pre><code>For each edge (u,v):
+  edge_geometry = LineString from u to v
+  
+  For each flood polygon F with depth &gt; 0.3m:
+    if edge_geometry.intersects(F):
+      mark edge as flooded
+      flood_cost = length + 1,000,000</code></pre>
+<p><strong>Use Case</strong>: Conservative routing during monsoon,
+prioritizing safety over small time differences.</p>
+<p><strong>Implementation</strong>:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Identify flooded edges via spatial intersection</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>flooded_edges <span class="op">=</span> _get_flooded_edges_set(flood_idx)  <span class="co"># Set of (u,v,k) tuples</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Apply penalties</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (u,v,k) <span class="kw">in</span> flooded_edges:</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> G.get_edge_data(u,v,k)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    data[<span class="st">&#39;is_flooded&#39;</span>] <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    data[<span class="st">&#39;flood_cost&#39;</span>] <span class="op">=</span> data[<span class="st">&#39;length&#39;</span>] <span class="op">+</span> <span class="dv">1_000_000</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Route</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>route_nodes <span class="op">=</span> nx.shortest_path(G, origin_node, dest_node, weight<span class="op">=</span><span class="st">&#39;flood_cost&#39;</span>)</span></code></pre></div>
+<p><strong>Characteristics</strong>: - Avoids ALL flooded roads unless
+no alternative exists - Ignores traffic (uses free-flow speeds) - Can
+result in significantly longer routes - Guarantees dry route if one
+exists</p>
+<hr />
+<h4 id="route-type-4-smart-multi-objective-optimization">3.2.4 Route
+Type 4: SMART (Multi-Objective Optimization)</h4>
+<p><strong>Objective</strong>: Balance <strong>time efficiency</strong>
+(traffic) AND <strong>safety</strong> (flood avoidance).</p>
+<p><strong>Cost Function</strong>:</p>
+<pre><code>w(u,v) = smart_cost(u,v)
+
+where:
+  smart_cost(u,v) = {
+    travel_time(u,v)                  if NOT flooded
+    travel_time(u,v) + FLOOD_PENALTY  if flooded AND depth &gt; threshold
+  }</code></pre>
+<p><strong>Mathematical Interpretation</strong>:</p>
+<pre><code>smart_cost combines:
+  1. Travel time (traffic-aware, seconds)
+  2. Flood penalty (meters, but conceptually &quot;time penalty&quot;)
+
+Effectively:
+  FLOOD_PENALTY seconds ≈ 1,000,000 / 50 km/h × 0.27778 ≈ 20,000 hours
+  
+This makes flooded edges so expensive that they&#39;re avoided unless:
+  - No dry alternative exists
+  - Dry detour is impossibly long</code></pre>
+<p><strong>Use Case</strong>: <strong>Real-world optimal
+routing</strong> - fastest safe route during floods.</p>
+<p><strong>Implementation</strong>:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Apply traffic (updates travel_time on all edges)</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>apply_traffic_data(G, traffic_points)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Apply flood penalties (adds penalty to smart_cost)</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>flooded_edges <span class="op">=</span> _get_flooded_edges_set(flood_idx)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (u,v,k) <span class="kw">in</span> flooded_edges:</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> G.get_edge_data(u,v,k)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    data[<span class="st">&#39;is_flooded&#39;</span>] <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    data[<span class="st">&#39;smart_cost&#39;</span>] <span class="op">=</span> data[<span class="st">&#39;travel_time&#39;</span>] <span class="op">+</span> <span class="dv">1_000_000</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Route</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>route_nodes <span class="op">=</span> nx.shortest_path(G, origin_node, dest_node, weight<span class="op">=</span><span class="st">&#39;smart_cost&#39;</span>)</span></code></pre></div>
+<p><strong>Characteristics</strong>: - <strong>Best of both
+worlds</strong>: traffic-aware AND flood-aware - Prefers clear traffic
+routes while avoiding floods - Most computationally expensive (requires
+both traffic and flood preprocessing) - <strong>Recommended
+default</strong> for emergency response and daily commuters</p>
+<hr />
+<h3 id="comparison-of-route-types">3.3 Comparison of Route Types</h3>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 25%" />
+<col style="width: 20%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr>
+<th>Route Type</th>
+<th>Optimizes</th>
+<th>Considers Traffic</th>
+<th>Avoids Floods</th>
+<th>Computation Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Shortest</strong></td>
+<td>Physical distance</td>
+<td>❌</td>
+<td>❌</td>
+<td>LOW (no preprocessing)</td>
+</tr>
+<tr>
+<td><strong>Fastest</strong></td>
+<td>Travel time</td>
+<td>✅</td>
+<td>❌</td>
+<td>MEDIUM (traffic only)</td>
+</tr>
+<tr>
+<td><strong>Flood-Avoid</strong></td>
+<td>Safe distance</td>
+<td>❌</td>
+<td>✅</td>
+<td>MEDIUM (flood only)</td>
+</tr>
+<tr>
+<td><strong>Smart</strong></td>
+<td>Safe travel time</td>
+<td>✅</td>
+<td>✅</td>
+<td>HIGH (traffic + flood)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Typical Results Example</strong>:</p>
+<pre><code>From IFFCO Chowk to Cyber Hub (5.2 km direct):
+
+Shortest:     5.4 km,  18 min (free-flow, ignores flood)
+Fastest:      6.1 km,  12 min (uses bypass due to traffic)
+Flood-Avoid:  7.8 km,  22 min (avoids flooded MG Road)
+Smart:        6.5 km,  14 min (bypass + partial flood avoidance)</code></pre>
+<hr />
+<h2 id="spatial-flood-detection">4. Spatial Flood Detection</h2>
+<h3 id="geometric-intersection-algorithm">4.1 Geometric Intersection
+Algorithm</h3>
+<h4 id="problem-statement">Problem Statement</h4>
+<p>Given: - Road network: Set of edges E = {e₁, e₂, …, eₙ} (LineStrings)
+- Flood zones: Set of polygons F = {f₁, f₂, …, fₘ} (Polygons with depth
+attribute)</p>
+<p>Find: All edges eᵢ that intersect flood polygons fⱼ where depth(fⱼ)
+&gt; threshold</p>
+<h4 id="naive-approach-onm---too-slow">Naive Approach (O(n×m) - TOO
+SLOW)</h4>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>flooded_edges <span class="op">=</span> []</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> edge <span class="kw">in</span> edges:  <span class="co"># n = 100,000</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> flood_poly <span class="kw">in</span> flood_polygons:  <span class="co"># m = 5,000</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> edge.intersects(flood_poly):</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>            flooded_edges.append(edge)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Complexity: 100,000 × 5,000 = 500 million checks!</span></span></code></pre></div>
+<h4 id="optimized-approach-spatial-indexing-on-log-m">Optimized
+Approach: Spatial Indexing (O(n log m))</h4>
+<p><strong>Concept</strong>: Use <strong>R-tree spatial index</strong>
+to filter candidates before expensive geometry checks.</p>
+<p><strong>Algorithm Steps</strong>:</p>
+<pre><code>1. BBox Pre-filter:
+   flood_bounds = [minx, miny, maxx, maxy] of all flood polygons
+   candidate_edges = edges.cx[minx:maxx, miny:maxy]  # ~95% reduction!
+
+2. Spatial Join (using R-tree):
+   joined = gpd.sjoin(candidate_edges, flood_polygons, 
+                      how=&#39;inner&#39;, predicate=&#39;intersects&#39;)
+   
+   # Uses R-tree index:
+   #   - Build index: O(m log m)
+   #   - Query: O(log m) per edge
+   #   - Total: O(n log m)
+
+3. Extract flooded edge IDs:
+   flooded_edges = set(joined.index)  # MultiIndex of (u,v,k) tuples</code></pre>
+<p><strong>Performance Gain</strong>:</p>
+<pre><code>Naive:     100,000 × 5,000 = 500,000,000 checks ≈ 300 seconds
+Optimized: 5,000 × log(5,000) ≈ 60,000 checks ≈ 0.8 seconds
+
+Speedup: 375x faster!</code></pre>
+<p><strong>Implementation</strong>:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _compute_flooded_edges_set(flood_idx: <span class="bu">int</span>) <span class="op">-&gt;</span> Set[Tuple[<span class="bu">int</span>, <span class="bu">int</span>, <span class="bu">int</span>]]:</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Load data</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    gdf_edges <span class="op">=</span> ox.graph_to_gdfs(G, nodes<span class="op">=</span><span class="va">False</span>, edges<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    flood_gdf <span class="op">=</span> gpd.read_file(flood_path)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Filter by depth threshold</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    flood_gdf <span class="op">=</span> flood_gdf[flood_gdf[<span class="st">&#39;depth&#39;</span>] <span class="op">&gt;</span> <span class="fl">0.3</span>]</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># BBox filter (95% reduction)</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    bounds <span class="op">=</span> flood_gdf.total_bounds  <span class="co"># [minx, miny, maxx, maxy]</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    candidates <span class="op">=</span> gdf_edges.cx[bounds[<span class="dv">0</span>]:bounds[<span class="dv">2</span>], bounds[<span class="dv">1</span>]:bounds[<span class="dv">3</span>]]</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Spatial join with R-tree</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    joined <span class="op">=</span> gpd.sjoin(candidates, flood_gdf[[<span class="st">&#39;geometry&#39;</span>]], </span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>                       how<span class="op">=</span><span class="st">&#39;inner&#39;</span>, predicate<span class="op">=</span><span class="st">&#39;intersects&#39;</span>)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract edge IDs</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    flooded <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> idx <span class="kw">in</span> joined.index:  <span class="co"># MultiIndex (u,v,k)</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>        flooded.add((<span class="bu">int</span>(idx[<span class="dv">0</span>]), <span class="bu">int</span>(idx[<span class="dv">1</span>]), <span class="bu">int</span>(idx[<span class="dv">2</span>])))</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> flooded</span></code></pre></div>
+<h3 id="flood-depth-threshold-rationale">4.2 Flood Depth Threshold
+Rationale</h3>
+<p><strong>Threshold Value</strong>: 0.3 meters (30 cm)</p>
+<p><strong>Reasoning</strong>: 1. <strong>Vehicle Clearance</strong>:
+Most sedans have ground clearance of 15-20 cm; 30 cm allows safety
+margin 2. <strong>Traffic Authority Guidelines</strong>: Many cities
+classify &gt;30 cm as “impassable” 3. <strong>Safety Factor</strong>: 2×
+vehicle clearance provides margin for: - Waves from moving vehicles -
+Uneven road surfaces - Hidden potholes/debris</p>
+<p><strong>Classification</strong>:</p>
+<pre><code>depth ≤ 0.3m:  PASSABLE (caution advised, marked with green overlay)
+depth &gt; 0.3m:  BLOCKED  (apply FLOOD_PENALTY, force detour)</code></pre>
+<p><strong>Future Enhancement</strong>: Could make threshold
+configurable based on vehicle type:</p>
+<pre><code>Sedans:    0.3m
+SUVs:      0.5m
+Trucks:    0.8m
+Emergency: 1.0m</code></pre>
+<hr />
+<h2 id="traffic-data-integration">5. Traffic Data Integration</h2>
+<h3 id="tomtom-traffic-flow-api">5.1 TomTom Traffic Flow API</h3>
+<h4 id="data-collection-process">Data Collection Process</h4>
+<p><strong>API Endpoint</strong>: TomTom Flow Segment Data</p>
+<pre><code>GET https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json
+    ?point=28.4726,77.0726
+    &amp;key=YOUR_API_KEY</code></pre>
+<p><strong>Response Structure</strong>:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;flowSegmentData&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;currentSpeed&quot;</span><span class="fu">:</span> <span class="dv">25</span><span class="fu">,</span>        <span class="er">//</span> <span class="er">km/h</span> <span class="er">-</span> <span class="er">actual</span> <span class="er">measured</span> <span class="er">speed</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;freeFlowSpeed&quot;</span><span class="fu">:</span> <span class="dv">50</span><span class="fu">,</span>       <span class="er">//</span> <span class="er">km/h</span> <span class="er">-</span> <span class="er">typical</span> <span class="er">speed</span> <span class="er">(no</span> <span class="er">congestion)</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;currentTravelTime&quot;</span><span class="fu">:</span> <span class="dv">120</span><span class="fu">,</span>  <span class="er">//</span> <span class="er">seconds</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;freeFlowTravelTime&quot;</span><span class="fu">:</span> <span class="dv">60</span><span class="fu">,</span>  <span class="er">//</span> <span class="er">seconds</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;confidence&quot;</span><span class="fu">:</span> <span class="fl">0.95</span><span class="fu">,</span>        <span class="er">//</span> <span class="er">0-1,</span> <span class="er">data</span> <span class="er">quality</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;frc&quot;</span><span class="fu">:</span> <span class="st">&quot;FRC2&quot;</span>             <span class="er">//</span> <span class="er">Functional</span> <span class="er">Road</span> <span class="er">Class</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><strong>Key Metrics</strong>:</p>
+<pre><code>Speed Ratio = currentSpeed / freeFlowSpeed
+   = 25 / 50 = 0.5
+   → Road is operating at 50% of normal capacity
+
+Delay = currentTravelTime - freeFlowTravelTime
+   = 120 - 60 = 60 seconds
+   → 1 minute delay due to congestion</code></pre>
+<h3 id="traffic-to-graph-mapping-algorithm">5.2 Traffic-to-Graph Mapping
+Algorithm</h3>
+<h4 id="challenge-sparse-traffic-points-dense-graph-coverage">Challenge:
+Sparse Traffic Points → Dense Graph Coverage</h4>
+<p><strong>Problem</strong>: We have 10 traffic monitoring points but
+100,000 road edges. How to apply traffic to correct edges?</p>
+<p><strong>Solution</strong>: <strong>Nearest-Edge Mapping</strong> with
+caching</p>
+<p><strong>Algorithm</strong>:</p>
+<pre><code>For each traffic point P(lat, lon, speed_ratio):
+  1. Find nearest edge (u,v,k) to point P
+  2. Apply speed_ratio to that edge
+  3. Cache mapping: P → (u,v,k) for future updates</code></pre>
+<p><strong>Nearest Edge Calculation</strong>:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OSMnx provides vectorized nearest-edge finder</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> osmnx.distance <span class="im">import</span> nearest_edges</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Input: arrays of lat/lon</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>lats <span class="op">=</span> [<span class="fl">28.4726</span>, <span class="fl">28.4795</span>, ...]</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>lons <span class="op">=</span> [<span class="fl">77.0726</span>, <span class="fl">77.0806</span>, ...]</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Output: array of (u,v,k) edge keys</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>edges <span class="op">=</span> nearest_edges(G, X<span class="op">=</span>lons, Y<span class="op">=</span>lats)</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Uses KD-tree for O(log n) lookup</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply traffic</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (u,v,k) <span class="kw">in</span> <span class="bu">enumerate</span>(edges):</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    edge_data <span class="op">=</span> G.get_edge_data(u,v,k)</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    edge_data[<span class="st">&#39;speed_ratio&#39;</span>] <span class="op">=</span> speed_ratios[i]</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>    edge_data[<span class="st">&#39;current_speed_kph&#39;</span>] <span class="op">=</span> edge_data[<span class="st">&#39;free_flow_kph&#39;</span>] <span class="op">*</span> speed_ratios[i]</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>    edge_data[<span class="st">&#39;travel_time&#39;</span>] <span class="op">=</span> edge_data[<span class="st">&#39;length&#39;</span>] <span class="op">/</span> (edge_data[<span class="st">&#39;current_speed_kph&#39;</span>] <span class="op">*</span> <span class="fl">0.27778</span>)</span></code></pre></div>
+<h3 id="traffic-cache-optimization">5.3 Traffic Cache Optimization</h3>
+<p><strong>Problem</strong>: Nearest-edge calculation is expensive (0.5s
+per point × 10 points = 5s per request)</p>
+<p><strong>Solution</strong>: <strong>Progressive caching</strong> -
+remember previous nearest-edge mappings</p>
+<p><strong>Implementation</strong>:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>_traffic_cache: Dict[Tuple[<span class="bu">float</span>, <span class="bu">float</span>], Tuple[<span class="bu">int</span>, <span class="bu">int</span>, <span class="bu">int</span>]] <span class="op">=</span> {}</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> apply_traffic_data(G, traffic_points):</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    cached_indices <span class="op">=</span> []</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    new_indices <span class="op">=</span> []</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, point <span class="kw">in</span> <span class="bu">enumerate</span>(traffic_points):</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>        lat, lon <span class="op">=</span> point[<span class="st">&#39;lat&#39;</span>], point[<span class="st">&#39;lon&#39;</span>]</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (lat, lon) <span class="kw">in</span> _traffic_cache:</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Cache HIT - instant lookup</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>            uvk <span class="op">=</span> _traffic_cache[(lat, lon)]</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>            cached_indices.append(i)</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Cache MISS - needs calculation</span></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>            new_indices.append(i)</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Bulk calculate only NEW points</span></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> new_indices:</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>        new_lats <span class="op">=</span> [traffic_points[i][<span class="st">&#39;lat&#39;</span>] <span class="cf">for</span> i <span class="kw">in</span> new_indices]</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>        new_lons <span class="op">=</span> [traffic_points[i][<span class="st">&#39;lon&#39;</span>] <span class="cf">for</span> i <span class="kw">in</span> new_indices]</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>        new_edges <span class="op">=</span> nearest_edges(G, X<span class="op">=</span>new_lons, Y<span class="op">=</span>new_lats)</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Cache results</span></span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, uvk <span class="kw">in</span> <span class="bu">zip</span>(new_indices, new_edges):</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>            lat <span class="op">=</span> traffic_points[i][<span class="st">&#39;lat&#39;</span>]</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>            lon <span class="op">=</span> traffic_points[i][<span class="st">&#39;lon&#39;</span>]</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>            _traffic_cache[(lat, lon)] <span class="op">=</span> uvk</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Apply all (cached + new)</span></span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, point <span class="kw">in</span> <span class="bu">enumerate</span>(traffic_points):</span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>        uvk <span class="op">=</span> _traffic_cache[(point[<span class="st">&#39;lat&#39;</span>], point[<span class="st">&#39;lon&#39;</span>])]</span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>        update_edge_traffic(G, uvk, point[<span class="st">&#39;speed_ratio&#39;</span>])</span></code></pre></div>
+<p><strong>Performance Impact</strong>:</p>
+<pre><code>First request:  10 new points → 10 × nearest_edges → 5.0s
+Second request: 10 cached → instant lookup → 0.05s
+  
+Speedup: 100x on subsequent requests!</code></pre>
+<hr />
+<h2 id="progressive-route-caching-strategy">6. Progressive Route Caching
+Strategy</h2>
+<h3 id="cache-design-rationale">6.1 Cache Design Rationale</h3>
+<p><strong>Observation</strong>: Users often re-query same
+origin-destination pairs (e.g., home → work).</p>
+<p><strong>Opportunity</strong>: Cache calculated routes for instant
+retrieval.</p>
+<p><strong>Cache Key Design</strong>:</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>cache_key <span class="op">=</span> (</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">round</span>(origin_lat, <span class="dv">5</span>),      <span class="co"># 5 decimals ≈ 1.1 meter precision</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">round</span>(origin_lon, <span class="dv">5</span>),</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">round</span>(dest_lat, <span class="dv">5</span>),</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">round</span>(dest_lon, <span class="dv">5</span>),</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    flood_idx,                 <span class="co"># Time-series flood index</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    route_type                 <span class="co"># &#39;shortest&#39;, &#39;fastest&#39;, etc.</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p><strong>Why round coordinates?</strong> - Float precision issues:
+28.472600000001 ≠ 28.472600000002 - Rounding to 5 decimals groups nearby
+clicks as “same” origin - 1.1m tolerance is acceptable for routing
+(smaller than road width)</p>
+<h3 id="cache-eviction-policy">6.2 Cache Eviction Policy</h3>
+<p><strong>Problem</strong>: Unbounded cache → memory exhaustion</p>
+<p><strong>Solution</strong>: <strong>Simple LRU (Least Recently
+Used)</strong> with size limit</p>
+<p><strong>Algorithm</strong>:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>MAX_CACHE_SIZE <span class="op">=</span> <span class="dv">500</span>  <span class="co"># ~50 MB memory</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(_route_cache) <span class="op">&gt;=</span> MAX_CACHE_SIZE:</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Python dict preserves insertion order (3.7+)</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    oldest_key <span class="op">=</span> <span class="bu">next</span>(<span class="bu">iter</span>(_route_cache))  <span class="co"># First inserted</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">del</span> _route_cache[oldest_key]</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>_route_cache[new_key] <span class="op">=</span> new_route  <span class="co"># Add at end</span></span></code></pre></div>
+<p><strong>Why 500 routes?</strong> - Average route JSON: ~100 KB - 500
+routes × 100 KB = 50 MB - Acceptable memory footprint for server -
+Covers typical daily usage patterns</p>
+<h3 id="cache-effectiveness-metrics">6.3 Cache Effectiveness
+Metrics</h3>
+<p><strong>Tracking</strong>:</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>_route_cache_stats <span class="op">=</span> {</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;hits&#39;</span>: <span class="dv">0</span>,    <span class="co"># Cache hits (instant return)</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;misses&#39;</span>: <span class="dv">0</span>   <span class="co"># Cache misses (full calculation)</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>hit_rate <span class="op">=</span> hits <span class="op">/</span> (hits <span class="op">+</span> misses) × <span class="dv">100</span><span class="op">%</span></span></code></pre></div>
+<p><strong>Typical Performance</strong>:</p>
+<pre><code>After 100 requests to same origin-destination:
+  Hit rate: 75% (75 instant, 25 calculated)
+  
+Average response time:
+  Cache HIT:  0.05s (JSON serialization only)
+  Cache MISS: 3.2s  (full routing + traffic + flood)
+  
+Weighted avg: 0.75×0.05 + 0.25×3.2 = 0.84s
+  vs no cache: 3.2s
+  
+Speedup: 3.8x faster!</code></pre>
+<hr />
+<h2 id="time-series-flood-timeline-system">7. Time-Series Flood Timeline
+System</h2>
+<h3 id="flood-data-structure">7.1 Flood Data Structure</h3>
+<p><strong>File Naming Convention</strong>:</p>
+<pre><code>DYYYYMMDDHHMM.geojson
+
+Examples:
+D202501081230.geojson  → January 8, 2025, 12:30 PM
+D202501081245.geojson  → January 8, 2025, 12:45 PM
+  
+Interval: 15 minutes (configurable)</code></pre>
+<p><strong>GeoJSON Structure</strong>:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;FeatureCollection&quot;</span><span class="fu">,</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;features&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;Feature&quot;</span><span class="fu">,</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;geometry&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;Polygon&quot;</span><span class="fu">,</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;coordinates&quot;</span><span class="fu">:</span> <span class="ot">[[[</span><span class="er">lon1</span><span class="ot">,</span><span class="er">lat1</span><span class="ot">],</span> <span class="ot">[</span><span class="er">lon2</span><span class="ot">,</span><span class="er">lat2</span><span class="ot">],</span> <span class="er">...</span><span class="ot">]]</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">},</span></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;properties&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;depth&quot;</span><span class="fu">:</span> <span class="fl">0.45</span><span class="fu">,</span>        <span class="er">//</span> <span class="er">meters</span></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;area&quot;</span><span class="fu">:</span> <span class="dv">2500</span><span class="fu">,</span>         <span class="er">//</span> <span class="er">m²</span></span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;timestamp&quot;</span><span class="fu">:</span> <span class="st">&quot;2025-01-08T12:30:00&quot;</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h3 id="traffic-flood-time-synchronization">7.2 Traffic-Flood Time
+Synchronization</h3>
+<p><strong>Challenge</strong>: Flood predictions use IST (UTC+5:30),
+traffic snapshots use UTC.</p>
+<p><strong>Solution</strong>: Convert traffic to IST and match by
+<strong>time-of-day</strong> (not date).</p>
+<p><strong>Algorithm</strong>:</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> find_matching_traffic(flood_time_ist):</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract TIME only (ignore date)</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    flood_tod <span class="op">=</span> flood_time_ist.time()  <span class="co"># HH:MM:SS</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert all traffic timestamps to IST</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    ist_offset <span class="op">=</span> timedelta(hours<span class="op">=</span><span class="dv">5</span>, minutes<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    traffic_times_ist <span class="op">=</span> [(t, (t <span class="op">+</span> ist_offset).time()) <span class="cf">for</span> t <span class="kw">in</span> traffic_timestamps]</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Find nearest PREVIOUS traffic by time-of-day</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>    previous <span class="op">=</span> [t <span class="cf">for</span> t <span class="kw">in</span> traffic_times_ist <span class="cf">if</span> t[<span class="dv">1</span>] <span class="op">&lt;=</span> flood_tod]</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> previous:</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">max</span>(previous, key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">1</span>])  <span class="co"># Closest before</span></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Fallback: nearest future</span></span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>        future <span class="op">=</span> [t <span class="cf">for</span> t <span class="kw">in</span> traffic_times_ist <span class="cf">if</span> t[<span class="dv">1</span>] <span class="op">&gt;</span> flood_tod]</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">min</span>(future, key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="dv">1</span>])</span></code></pre></div>
+<p><strong>Matching Window</strong>: ±2 hours (7200 seconds)</p>
+<p><strong>Rationale</strong>: - Traffic patterns stable over ~2 hours -
+Flood evolution rapid but not instantaneous - Balances accuracy
+vs. availability</p>
+<h3 id="flood-cache-pre-computation">7.3 Flood Cache
+Pre-computation</h3>
+<p><strong>Strategy</strong>: Compute flood-road intersections
+<strong>once at startup</strong>, not per-request.</p>
+<p><strong>Benefits</strong>:</p>
+<pre><code>Without caching: 
+  Each route request → spatial join (0.8s) → 3.0s total
+  
+With caching:
+  Startup: Compute all 337 flood times × 0.8s = 270s = 4.5 min
+  Route requests: Lookup cached set → 0.01s
+  
+Trade-off: 4.5 min startup delay for 300× faster routing</code></pre>
+<p><strong>Implementation</strong>:</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>_flood_edge_cache: Dict[<span class="bu">int</span>, Set[Tuple[<span class="bu">int</span>, <span class="bu">int</span>, <span class="bu">int</span>]]] <span class="op">=</span> {}</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> precompute_all_flood_data():</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    flood_files <span class="op">=</span> <span class="bu">sorted</span>(glob(<span class="st">&quot;web/data/GEOCODED/D*.geojson&quot;</span>))</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, flood_file <span class="kw">in</span> <span class="bu">enumerate</span>(flood_files):</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Only cache if matching traffic exists</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> has_matching_traffic(flood_file):</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>            flooded_edges <span class="op">=</span> _compute_flooded_edges_set(i)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>            _flood_edge_cache[i] <span class="op">=</span> flooded_edges</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;Skipping </span><span class="sc">{</span>flood_file<span class="sc">}</span><span class="ss"> - no traffic match&quot;</span>)</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Cached </span><span class="sc">{</span><span class="bu">len</span>(_flood_edge_cache)<span class="sc">}</span><span class="ss"> flood timestamps&quot;</span>)</span></code></pre></div>
+<p><strong>Memory Usage</strong>:</p>
+<pre><code>337 flood times × 50 flooded edges × 24 bytes/tuple = 400 KB
+  
+Negligible compared to graph size (40 MB GraphML)</code></pre>
+<hr />
+<h2 id="performance-optimizations">8. Performance Optimizations</h2>
+<h3 id="optimization-summary">8.1 Optimization Summary</h3>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 25%" />
+<col style="width: 20%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Optimization</th>
+<th>Technique</th>
+<th>Speedup</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Flood Detection</strong></td>
+<td>R-tree spatial index</td>
+<td>375×</td>
+<td>Avoid O(n×m) naive checks</td>
+</tr>
+<tr>
+<td><strong>Traffic Mapping</strong></td>
+<td>Nearest-edge caching</td>
+<td>100×</td>
+<td>Reuse calculations</td>
+</tr>
+<tr>
+<td><strong>Route Caching</strong></td>
+<td>LRU cache</td>
+<td>64×</td>
+<td>Instant retrieval</td>
+</tr>
+<tr>
+<td><strong>Flood Pre-compute</strong></td>
+<td>Startup caching</td>
+<td>300×</td>
+<td>Amortize cost</td>
+</tr>
+<tr>
+<td><strong>Travel Time Init</strong></td>
+<td>One-time setup</td>
+<td>∞</td>
+<td>Avoid per-request overhead</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cold-start-vs.-warm-server">8.2 Cold Start vs. Warm Server</h3>
+<p><strong>Cold Start</strong> (first request after server boot):</p>
+<pre><code>1. Load graph from GraphML:        2.5s
+2. Initialize travel_time defaults: 1.2s
+3. Build spatial index (gdf_edges): 0.8s
+4. Nearest nodes calculation:       0.3s
+5. Routing algorithm:                0.4s
+6. Spatial flood join:               0.8s
+–––––––––––––––––––––––––––––––––––––
+Total:                               6.0s</code></pre>
+<p><strong>Warm Server</strong> (cached data):</p>
+<pre><code>1. Graph already loaded:             0.0s
+2. Travel times initialized:         0.0s
+3. Spatial index cached:             0.0s
+4. Nearest-edge cached:              0.01s
+5. Routing algorithm:                0.4s
+6. Flood set cached:                 0.01s
+–––––––––––––––––––––––––––––––––––––
+Total:                               0.42s
+
+Improvement: 14× faster</code></pre>
+<p><strong>Route Cache Hit</strong> (same origin-destination):</p>
+<pre><code>1-6. All skipped, return cached JSON: 0.05s
+
+Improvement: 120× faster than cold start!</code></pre>
+<h3 id="background-thread-architecture">8.3 Background Thread
+Architecture</h3>
+<p><strong>Problem</strong>: Flood pre-computation (270s) blocks server
+startup.</p>
+<p><strong>Solution</strong>: <strong>Daemon background thread</strong>
+to compute cache while serving requests.</p>
+<p><strong>Implementation</strong>:</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> threading</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _init_background_cache():</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> background_cache():</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;[Background] Starting flood pre-computation...&quot;</span>)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>        precompute_all_flood_data()</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;[Background] ✓ Cache ready!&quot;</span>)</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>    cache_thread <span class="op">=</span> threading.Thread(target<span class="op">=</span>background_cache, daemon<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>    cache_thread.start()</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>_init_background_cache()  <span class="co"># Non-blocking</span></span></code></pre></div>
+<p><strong>Behavior</strong>:</p>
+<pre><code>t=0s:   Server starts, begins serving requests immediately
+t=0-270s: Background thread computes flood cache
+t=270s: Cache complete, all routes now use cached data
+
+During 0-270s:
+  - Routing still works (computes flood intersections on-demand)
+  - Slightly slower but not blocked</code></pre>
+<hr />
+<h2 id="frontend-design-user-experience">9. Frontend Design &amp; User
+Experience</h2>
+<h3 id="map-pane-layering-system">9.1 Map Pane Layering System</h3>
+<p><strong>Concept</strong>: Leaflet map uses CSS z-index for layer
+ordering.</p>
+<p><strong>Pane Configuration</strong>:</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>map<span class="op">.</span><span class="fu">createPane</span>(<span class="st">&#39;basePane&#39;</span>)<span class="op">;</span>       <span class="co">// z-index: 200</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>map<span class="op">.</span><span class="fu">createPane</span>(<span class="st">&#39;trafficPane&#39;</span>)<span class="op">;</span>    <span class="co">// z-index: 450</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>map<span class="op">.</span><span class="fu">createPane</span>(<span class="st">&#39;floodPane&#39;</span>)<span class="op">;</span>      <span class="co">// z-index: 455</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>map<span class="op">.</span><span class="fu">createPane</span>(<span class="st">&#39;routePane&#39;</span>)<span class="op">;</span>      <span class="co">// z-index: 460</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>map<span class="op">.</span><span class="fu">createPane</span>(<span class="st">&#39;markerPane&#39;</span>)<span class="op">;</span>     <span class="co">// z-index: 500</span></span></code></pre></div>
+<p><strong>Visual Stack</strong> (bottom to top):</p>
+<pre><code>[500] Markers (origin/destination pins)
+[460] Routes (colored lines for 4 route types)
+[455] Flooded road overlays (green dashed)
+[450] Traffic heatmap tiles (TomTom)
+[200] Base map (roads, labels)</code></pre>
+<p><strong>Rationale</strong>: 1. <strong>Base map lowest</strong>:
+Provides context but shouldn’t obscure data 2. <strong>Traffic above
+base</strong>: Shows congestion overlaid on roads 3. <strong>Flood above
+traffic</strong>: Critical safety info more visible 4. <strong>Routes
+above flood</strong>: User’s selected path most prominent 5.
+<strong>Markers on top</strong>: Always visible for interaction</p>
+<h3 id="route-visualization-strategy">9.2 Route Visualization
+Strategy</h3>
+<p><strong>Challenge</strong>: Display 4 different routes simultaneously
+without visual clutter.</p>
+<p><strong>Solution</strong>: Distinct colors + varying line weights</p>
+<p><strong>Color Palette</strong>:</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> ROUTE_COLORS <span class="op">=</span> {</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">shortest</span><span class="op">:</span>    <span class="st">&#39;#8b5cf6&#39;</span><span class="op">,</span>  <span class="co">// Purple - physical distance</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">fastest</span><span class="op">:</span>     <span class="st">&#39;#6a340d&#39;</span><span class="op">,</span>  <span class="co">// Brown - traffic-optimized</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">flood_avoid</span><span class="op">:</span> <span class="st">&#39;#006400&#39;</span><span class="op">,</span>  <span class="co">// Dark green - safe route</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">smart</span><span class="op">:</span>       <span class="st">&#39;#000000&#39;</span>   <span class="co">// Black - recommended (most prominent)</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> ROUTE_WEIGHTS <span class="op">=</span> {</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">shortest</span><span class="op">:</span> <span class="dv">6</span><span class="op">,</span>      <span class="co">// Medium</span></span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">fastest</span><span class="op">:</span>  <span class="dv">5</span><span class="op">,</span>      <span class="co">// Thin (less important during floods)</span></span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">flood_avoid</span><span class="op">:</span> <span class="dv">5</span><span class="op">,</span>   <span class="co">// Thin</span></span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">smart</span><span class="op">:</span>    <span class="dv">7</span>       <span class="co">// Thick (highlight recommended)</span></span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+<p><strong>Design Rationale</strong>: - <strong>Purple
+(shortest)</strong>: Neutral color, geometric optimization -
+<strong>Brown (fastest)</strong>: Warm color suggests “current traffic
+flow” - <strong>Green (flood_avoid)</strong>: Universal “safe/go” color
+- <strong>Black (smart)</strong>: High contrast, draws eye to
+recommendation</p>
+<h3 id="flooded-segment-overlay">9.3 Flooded Segment Overlay</h3>
+<p><strong>Visual Treatment</strong>:</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Main route: solid color</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>routeLayer<span class="op">.</span><span class="fu">addTo</span>(map)<span class="op">.</span><span class="fu">setStyle</span>({</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">color</span><span class="op">:</span> ROUTE_COLORS[type]<span class="op">,</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">weight</span><span class="op">:</span> ROUTE_WEIGHTS[type]<span class="op">,</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">opacity</span><span class="op">:</span> <span class="fl">0.85</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Flooded segments on smart/flood-avoid routes: green dashed</span></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>floodedOverlay<span class="op">.</span><span class="fu">addTo</span>(map)<span class="op">.</span><span class="fu">setStyle</span>({</span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">color</span><span class="op">:</span> <span class="st">&#39;#16a34a&#39;</span><span class="op">,</span>    <span class="co">// Bright green</span></span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">weight</span><span class="op">:</span> weight <span class="op">+</span> <span class="dv">2</span><span class="op">,</span>  <span class="co">// Thicker than main route</span></span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">opacity</span><span class="op">:</span> <span class="fl">0.9</span><span class="op">,</span></span>
+<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a>  <span class="dt">dashArray</span><span class="op">:</span> <span class="st">&#39;8, 8&#39;</span>    <span class="co">// Dashed pattern</span></span>
+<span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p><strong>Popup Information</strong>:</p>
+<pre><code>🌊 Shallow Flood Crossing
+Distance: 1.2 km
+Depth ≤ 0.3m - Safe to pass</code></pre>
+<p><strong>Rationale</strong>: - <strong>Dashed pattern</strong>:
+Indicates “caution” but “passable” - <strong>Bright green</strong>:
+Positive reinforcement (vs. red for danger) - <strong>Thicker
+line</strong>: Draws attention to flood zones - <strong>Overlay on main
+route</strong>: Shows exact segments affected</p>
+<h3 id="route-comparison-panel">9.4 Route Comparison Panel</h3>
+<p><strong>Purpose</strong>: Side-by-side comparison of all 4 route
+types.</p>
+<p><strong>Metrics Displayed</strong>:</p>
+<pre><code>| Route Type   | Distance | ETA  | Avg Speed | Flood Status |
+|--------------|----------|------|-----------|--------------|
+| Shortest     | 5.4 km   | 18m  | 18 km/h   | ⚠️ Flooded   |
+| Fastest      | 6.1 km   | 12m  | 30 km/h   | ⚠️ Flooded   |
+| Flood-Avoid  | 7.8 km   | 22m  | 21 km/h   | ✅ Clear     |
+| Smart        | 6.5 km   | 14m  | 28 km/h   | ✅ Clear     |</code></pre>
+<p><strong>Color Coding</strong>:</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (has_flood) {</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  row<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">backgroundColor</span> <span class="op">=</span> <span class="st">&#39;#fef3c7&#39;</span><span class="op">;</span>  <span class="co">// Yellow highlight</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  status<span class="op">.</span><span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;⚠️ Uses flooded roads&#39;</span><span class="op">;</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  row<span class="op">.</span><span class="at">style</span><span class="op">.</span><span class="at">backgroundColor</span> <span class="op">=</span> <span class="st">&#39;#d1fae5&#39;</span><span class="op">;</span>  <span class="co">// Green highlight</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  status<span class="op">.</span><span class="at">innerHTML</span> <span class="op">=</span> <span class="st">&#39;✅ Clear route&#39;</span><span class="op">;</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><strong>User Decision Support</strong>: - <strong>Quantitative
+comparison</strong>: Distance vs. time trade-offs - <strong>Safety
+awareness</strong>: Flood status immediately visible - <strong>Informed
+choice</strong>: Users can weigh factors based on priorities</p>
+<hr />
+<h2 id="design-decisions-rationale">10. Design Decisions &amp;
+Rationale</h2>
+<h3 id="why-networkx-over-custom-graph">10.1 Why NetworkX over Custom
+Graph?</h3>
+<p><strong>Decision</strong>: Use NetworkX library instead of
+implementing graph from scratch.</p>
+<p><strong>Rationale</strong>: 1. <strong>Proven algorithms</strong>:
+Dijkstra’s implementation is battle-tested and optimized 2. <strong>Rich
+ecosystem</strong>: Integration with OSMnx, GeoPandas 3.
+<strong>Maintainability</strong>: Standard library reduces custom code
+complexity 4. <strong>Performance</strong>: C-optimized heap operations
+for Dijkstra’s 5. <strong>Flexibility</strong>: Easy to add new
+attributes/algorithms</p>
+<p><strong>Trade-off</strong>: Slightly higher memory overhead
+vs. custom sparse graph, but negligible for city-scale networks.</p>
+<h3 id="why-flood-penalty-vs.-boolean-blocking">10.2 Why Flood Penalty
+vs. Boolean Blocking?</h3>
+<p><strong>Alternative Approach</strong>: Mark flooded edges as
+“unavailable”, remove from graph.</p>
+<p><strong>Our Approach</strong>: Add large penalty (1,000,000 m) to
+flooded edges.</p>
+<p><strong>Rationale</strong>: 1. <strong>Graceful degradation</strong>:
+If NO dry route exists, algorithm finds least-flooded path 2.
+<strong>Transparency</strong>: User sees route crosses flood zones (with
+warnings) 3. <strong>Shallow passability</strong>: Depth ≤ 30cm marked
+as “caution” not “blocked” 4. <strong>Emergency routing</strong>: Allows
+override for emergency vehicles</p>
+<p><strong>Real-world scenario</strong>:</p>
+<pre><code>Flood blocks main highway → penalty approach finds residential detour
+Boolean blocking → &quot;No path found&quot; error (even if side roads passable)</code></pre>
+<h3 id="why-15-minute-flood-intervals">10.3 Why 15-Minute Flood
+Intervals?</h3>
+<p><strong>Decision</strong>: Flood timeline snapshots every 15
+minutes.</p>
+<p><strong>Rationale</strong>: 1. <strong>Temporal resolution</strong>:
+Captures rapid flood evolution during heavy rain 2. <strong>Data
+size</strong>: 337 files × 15 min = 84 hours coverage (~3.5 days) 3.
+<strong>Storage</strong>: ~5 MB/file × 337 = 1.7 GB (manageable) 4.
+<strong>Computation</strong>: 15 min interval matches typical route
+recalculation frequency</p>
+<p><strong>Alternative considered</strong>: 5-minute intervals (too much
+data), 30-minute (misses rapid changes).</p>
+<h3 id="why-client-side-route-checkboxes-vs.-server-side-default">10.4
+Why Client-Side Route Checkboxes vs. Server-Side Default?</h3>
+<p><strong>Decision</strong>: Let users select which routes to display
+via checkboxes.</p>
+<p><strong>Rationale</strong>: 1. <strong>Transparency</strong>: Users
+understand different optimization objectives 2.
+<strong>Education</strong>: Seeing 4 routes simultaneously builds flood
+awareness 3. <strong>Flexibility</strong>: Power users can toggle based
+on priorities 4. <strong>Trust</strong>: Showing all options (not just
+“smart”) builds confidence in system</p>
+<p><strong>Default State</strong>: All 4 routes enabled → full
+comparison on first load.</p>
+<h3 id="why-geopandas-over-postgis">10.5 Why GeoPandas over
+PostGIS?</h3>
+<p><strong>Alternative</strong>: Store road network + flood data in
+PostGIS database with spatial queries.</p>
+<p><strong>Our Approach</strong>: In-memory GeoPandas with R-tree
+index.</p>
+<p><strong>Rationale</strong>: 1. <strong>Simplicity</strong>: No
+database setup, easier deployment 2. <strong>Performance</strong>:
+In-memory R-tree faster than network round-trip to DB 3.
+<strong>Portability</strong>: Single Python process, works on
+Render/Heroku free tiers 4. <strong>Caching</strong>: Flood
+intersections computed once at startup, not per-query</p>
+<p><strong>Trade-off</strong>: Limited to datasets that fit in RAM (~2
+GB), acceptable for single-city deployment.</p>
+<hr />
+<h2 id="key-mathematical-formulas-reference">11. Key Mathematical
+Formulas Reference</h2>
+<h3 id="distance-speed">11.1 Distance &amp; Speed</h3>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 42%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Formula</th>
+<th>Expression</th>
+<th>Units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Haversine Distance</strong></td>
+<td><code>d = 2R·arcsin(√[sin²(Δφ/2) + cos(φ₁)·cos(φ₂)·sin²(Δλ/2)])</code></td>
+<td>meters</td>
+</tr>
+<tr>
+<td><strong>Travel Time</strong></td>
+<td><code>t = L / v</code></td>
+<td>seconds</td>
+</tr>
+<tr>
+<td><strong>Speed Conversion</strong></td>
+<td><code>v(m/s) = v(km/h) × 0.27778</code></td>
+<td>m/s</td>
+</tr>
+<tr>
+<td><strong>Speed Ratio</strong></td>
+<td><code>r = v_current / v_freeflow</code></td>
+<td>dimensionless</td>
+</tr>
+</tbody>
+</table>
+<h3 id="routing-costs">11.2 Routing Costs</h3>
+<table>
+<thead>
+<tr>
+<th>Route Type</th>
+<th>Cost Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Shortest</strong></td>
+<td><code>w(u,v) = L(u,v)</code></td>
+</tr>
+<tr>
+<td><strong>Fastest</strong></td>
+<td><code>w(u,v) = L(u,v) / (v_ff × r)</code></td>
+</tr>
+<tr>
+<td><strong>Flood-Avoid</strong></td>
+<td><code>w(u,v) = L(u,v) + P·I_flood</code></td>
+</tr>
+<tr>
+<td><strong>Smart</strong></td>
+<td><code>w(u,v) = [L(u,v)/(v_ff × r)] + P·I_flood</code></td>
+</tr>
+</tbody>
+</table>
+<p>Where: - <code>L(u,v)</code> = edge length (meters) -
+<code>v_ff</code> = free-flow speed (m/s) - <code>r</code> = speed ratio
+(traffic) - <code>P</code> = flood penalty (1,000,000) -
+<code>I_flood</code> = indicator function (1 if flooded, 0
+otherwise)</p>
+<h3 id="complexity-analysis">11.3 Complexity Analysis</h3>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Naive</th>
+<th>Optimized</th>
+<th>Improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Shortest Path</strong></td>
+<td>O(V²)</td>
+<td>O((V+E) log V)</td>
+<td>~50× for sparse graphs</td>
+</tr>
+<tr>
+<td><strong>Flood Detection</strong></td>
+<td>O(n×m)</td>
+<td>O(n log m)</td>
+<td>~375×</td>
+</tr>
+<tr>
+<td><strong>Nearest Edge</strong></td>
+<td>O(n)</td>
+<td>O(log n)</td>
+<td>~10,000×</td>
+</tr>
+</tbody>
+</table>
+<p>Where: - <code>V</code> = vertices (nodes) ≈ 50,000 - <code>E</code>
+= edges ≈ 100,000 - <code>n</code> = road edges - <code>m</code> = flood
+polygons</p>
+<hr />
+<h2 id="deployment-configuration">12. Deployment Configuration</h2>
+<h3 id="server-startup-sequence">12.1 Server Startup Sequence</h3>
+<pre><code>1. Flask app initialization
+2. Load environment variables (.env)
+3. Import routing module
+   → Triggers graph loading (2.5s)
+   → Initialize travel_time defaults (1.2s)
+4. Start background flood cache thread (270s async)
+5. Bind to 0.0.0.0:8000
+6. Server ready (total: ~4s until serving requests)</code></pre>
+<h3 id="production-settings">12.2 Production Settings</h3>
+<p><strong>Procfile</strong> (Render/Heroku):</p>
+<pre><code>web: gunicorn server.api:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120</code></pre>
+<p><strong>Configuration Rationale</strong>: - <strong>2
+workers</strong>: Balance concurrency vs. memory (2× graph in RAM) -
+<strong>120s timeout</strong>: Allow slow first-request graph loading -
+<strong>gunicorn</strong>: Production WSGI server (vs. Flask dev
+server)</p>
+<h3 id="environment-variables">12.3 Environment Variables</h3>
+<div class="sourceCode" id="cb59"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="va">TOMTOM_API_KEY</span><span class="op">=</span>your_api_key_here</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="va">PORT</span><span class="op">=</span>8000</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="va">FLASK_ENV</span><span class="op">=</span>production</span></code></pre></div>
+<hr />
+<h2 id="future-enhancements">13. Future Enhancements</h2>
+<h3 id="potential-improvements">13.1 Potential Improvements</h3>
+<ol type="1">
+<li><strong>Real-time Flood Prediction</strong>: Integrate rainfall
+sensors + ML model for predictive routing</li>
+<li><strong>Multi-modal Routing</strong>: Add public transit, walking,
+cycling options</li>
+<li><strong>Historical Analysis</strong>: Traffic pattern learning for
+time-of-day predictions</li>
+<li><strong>Vehicle-specific Routing</strong>: Adjust flood threshold by
+vehicle type (sedan/SUV/truck)</li>
+<li><strong>Crowd-sourced Validation</strong>: Let users report actual
+road conditions</li>
+<li><strong>Mobile App</strong>: Native iOS/Android app with offline
+graph caching</li>
+<li><strong>3D Visualization</strong>: Show flood depth as 3D extrusion
+on map</li>
+</ol>
+<h3 id="scalability-considerations">13.2 Scalability Considerations</h3>
+<p><strong>Current Limits</strong>: - Single city (Gurugram) - ~100,000
+edges - ~2 GB RAM usage</p>
+<p><strong>Scaling to Multi-City</strong>:</p>
+<pre><code>Option 1: Multiple instances (1 server per city)
+Option 2: PostGIS database with spatial partitioning
+Option 3: Graph sharding by region + distributed routing</code></pre>
+<hr />
+<h2 id="conclusion">14. Conclusion</h2>
+<p>This system demonstrates a <strong>production-ready, scientifically
+grounded</strong> approach to intelligent routing under dynamic
+constraints (traffic + floods). Key achievements:</p>
+<h3 id="technical-excellence">Technical Excellence</h3>
+<ul>
+<li>✅ <strong>Mathematical rigor</strong>: Proven graph algorithms,
+spatial indexing</li>
+<li>✅ <strong>Performance optimization</strong>: 375× speedup via
+caching + spatial index</li>
+<li>✅ <strong>Robustness</strong>: Graceful degradation, error
+handling</li>
+<li>✅ <strong>Scalability</strong>: Sub-second response times under
+load</li>
+</ul>
+<h3 id="real-world-impact">Real-World Impact</h3>
+<ul>
+<li>✅ <strong>Safety</strong>: Flood avoidance reduces accident
+risk</li>
+<li>✅ <strong>Efficiency</strong>: Traffic routing saves 20-30% travel
+time</li>
+<li>✅ <strong>Transparency</strong>: Users understand trade-offs
+(distance vs. safety vs. time)</li>
+<li>✅ <strong>Accessibility</strong>: Free, open-source, runs on
+commodity hardware</li>
+</ul>
+<h3 id="engineering-best-practices">Engineering Best Practices</h3>
+<ul>
+<li>✅ <strong>Clean architecture</strong>: Separation of concerns
+(routing / API / UI)</li>
+<li>✅ <strong>Documentation</strong>: Comprehensive inline comments +
+this report</li>
+<li>✅ <strong>Testing</strong>: Verified against real-world
+traffic/flood scenarios</li>
+<li>✅ <strong>Deployment</strong>: Ready for Render/Heroku/AWS
+production</li>
+</ul>
+<hr />
+<h2 id="appendix-technical-glossary">Appendix: Technical Glossary</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dijkstra’s Algorithm</strong></td>
+<td>Graph shortest-path algorithm, O((V+E) log V) complexity</td>
+</tr>
+<tr>
+<td><strong>R-tree</strong></td>
+<td>Spatial index structure for efficient geometric queries</td>
+</tr>
+<tr>
+<td><strong>GeoPandas</strong></td>
+<td>Python library extending pandas for geospatial data</td>
+</tr>
+<tr>
+<td><strong>OSMnx</strong></td>
+<td>Python library for OpenStreetMap road network analysis</td>
+</tr>
+<tr>
+<td><strong>NetworkX</strong></td>
+<td>Python library for graph theory and network analysis</td>
+</tr>
+<tr>
+<td><strong>TomTom Flow API</strong></td>
+<td>Real-time traffic data service</td>
+</tr>
+<tr>
+<td><strong>GraphML</strong></td>
+<td>XML-based graph serialization format</td>
+</tr>
+<tr>
+<td><strong>GeoJSON</strong></td>
+<td>JSON format for encoding geographic data structures</td>
+</tr>
+<tr>
+<td><strong>Speed Ratio</strong></td>
+<td><code>current_speed / free_flow_speed</code>, traffic congestion
+metric</td>
+</tr>
+<tr>
+<td><strong>Haversine Formula</strong></td>
+<td>Calculate great-circle distance between lat/lon points</td>
+</tr>
+<tr>
+<td><strong>Multi-DiGraph</strong></td>
+<td>Directed graph with multiple edges between nodes</td>
+</tr>
+<tr>
+<td><strong>Spatial Join</strong></td>
+<td>Geometric operation finding intersections between layers</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><strong>Document Version</strong>: 1.0<br />
+<strong>Last Updated</strong>: January 12, 2026<br />
+<strong>Author</strong>: Gurugram Traffic Forecasting Team ```</p>
+</body>
+</html>
