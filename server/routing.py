@@ -6,45 +6,26 @@ from typing import Dict, Any, List, Tuple, Optional, Set
 import math
 import json
 import time
+import sys
 from datetime import datetime, timedelta
 
 import networkx as nx
 
-try:
-    import osmnx as ox
-    OSMNX_AVAILABLE = True
-except ImportError:
-    ox = None
-    OSMNX_AVAILABLE = False
+# Import global configuration
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import config as global_config
 
-# Optional GeoPandas for flood detection fast path
-try:
-    import geopandas as gpd
-    from shapely.geometry import LineString
-    GEOPANDAS_OK = True
-except Exception:
-    gpd = None
-    LineString = None
-    GEOPANDAS_OK = False
+# Use global config for libraries
+GEOPANDAS_OK = global_config.GEOPANDAS_OK
+OSMNX_AVAILABLE = global_config.OSMNX_AVAILABLE
+gpd = global_config.gpd
+ox = global_config.ox
+LineString = global_config.LineString
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = global_config.PROJECT_ROOT
 
-DEFAULT_CANDIDATES = [
-    PROJECT_ROOT / "web" / "data" / "ggn_extent.graphml",
-    PROJECT_ROOT / "ggn_extent.graphml",
-    PROJECT_ROOT / "data" / "ggn_extent.graphml",
-    PROJECT_ROOT / "collector" / "outputs" / "ggn_extent.graphml",
-    PROJECT_ROOT.parent / "ggn_extent.graphml",
-]
-
-ROAD_GEOJSON_CANDIDATES = [
-    PROJECT_ROOT / "web" / "data" / "clean_roads.geojson",
-    PROJECT_ROOT / "web" / "data" / "ggn_roadways_clean.geojson",
-    PROJECT_ROOT / "ggn_roadways_clean.geojson",
-    PROJECT_ROOT / "data" / "ggn_roadways_clean.geojson",
-    PROJECT_ROOT / "collector" / "outputs" / "ggn_roadways_clean.geojson",
-    PROJECT_ROOT.parent / "ggn_roadways_clean.geojson",
-]
+DEFAULT_CANDIDATES = global_config.GRAPH_CANDIDATES
+ROAD_GEOJSON_CANDIDATES = global_config.ROADS_CANDIDATES
 
 _graph: Optional[nx.MultiDiGraph] = None
 _gdf_edges = None
@@ -61,15 +42,13 @@ _flood_meta_cache: Dict[int, Dict[str, Any]] = {}  # logging/meta
 # Traffic cache: (lat, lon) -> (u, v, k)
 _traffic_cache: Dict[Tuple[float, float], Tuple[int, int, int]] = {}
 
-# Progressive Route Cache: stores calculated routes for instant retrieval
-# Key: (origin_lat, origin_lon, dest_lat, dest_lon, flood_idx, route_type)
-# Value: route object (path coordinates, distance, time, etc.)
 _route_cache: Dict[Tuple[float, float, float, float, int, str], Dict[str, Any]] = {}
 _route_cache_stats = {"hits": 0, "misses": 0}  # Track cache effectiveness
-MAX_ROUTE_CACHE_SIZE = 500  # Prevent unlimited memory growth
 
-FLOOD_DEPTH_THRESHOLD_M = 0.3
-FLOOD_PENALTY = 1_000_000.0
+# Use global configuration constants
+MAX_ROUTE_CACHE_SIZE = global_config.MAX_ROUTE_CACHE_SIZE
+FLOOD_DEPTH_THRESHOLD_M = global_config.FLOOD_DEPTH_THRESHOLD_M
+FLOOD_PENALTY = global_config.FLOOD_PENALTY
 
 
 # ---------------------------
@@ -85,7 +64,7 @@ def _pick_graphml_path() -> Path:
 
 
 def load_graph() -> nx.MultiDiGraph:
-    global _graph, _graphml_path_usedo
+    global _graph, _graphml_path_used
 
     if _graph is not None:
         return _graph
