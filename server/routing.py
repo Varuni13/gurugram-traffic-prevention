@@ -50,6 +50,173 @@ MAX_ROUTE_CACHE_SIZE = global_config.MAX_ROUTE_CACHE_SIZE
 FLOOD_DEPTH_THRESHOLD_M = global_config.FLOOD_DEPTH_THRESHOLD_M
 FLOOD_PENALTY = global_config.FLOOD_PENALTY
 
+# Persistent cache paths
+CACHE_DIR = global_config.CACHE_DIR
+FLOOD_CACHE_FILE = global_config.FLOOD_CACHE_FILE
+ROUTE_CACHE_FILE = global_config.ROUTE_CACHE_FILE
+
+
+# ---------------------------
+# Persistent Cache Functions
+# ---------------------------
+def _ensure_cache_dir():
+    """Create cache directory if it doesn't exist."""
+    if not CACHE_DIR.exists():
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        print(f"[Cache] Created cache directory: {CACHE_DIR}")
+
+
+def save_flood_cache_to_disk() -> bool:
+    """
+    Save flood edge cache to disk for persistence across restarts.
+    Returns True if successful.
+    """
+    global _flood_edge_cache
+    if not _flood_edge_cache:
+        print("[Cache] No flood cache to save")
+        return False
+    
+    try:
+        _ensure_cache_dir()
+        
+        # Convert sets to lists for JSON serialization
+        export_data = {
+            "version": "1.0",
+            "created_at": datetime.now().isoformat(),
+            "entries_count": len(_flood_edge_cache),
+            "entries": {
+                str(k): [list(edge) for edge in v]
+                for k, v in _flood_edge_cache.items()
+            }
+        }
+        
+        with open(FLOOD_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(export_data, f)
+        
+        print(f"[Cache] ✓ Saved flood cache ({len(_flood_edge_cache)} entries) to {FLOOD_CACHE_FILE.name}")
+        return True
+    except Exception as e:
+        print(f"[Cache] ✗ Failed to save flood cache: {e}")
+        return False
+
+
+def load_flood_cache_from_disk() -> bool:
+    """
+    Load flood edge cache from disk.
+    Returns True if cache was loaded successfully.
+    """
+    global _flood_edge_cache
+    
+    if not FLOOD_CACHE_FILE.exists():
+        print(f"[Cache] No flood cache file found at {FLOOD_CACHE_FILE}")
+        return False
+    
+    try:
+        with open(FLOOD_CACHE_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        # Convert lists back to sets of tuples
+        for key, edges in data.get("entries", {}).items():
+            _flood_edge_cache[int(key)] = set(tuple(e) for e in edges)
+        
+        created = data.get("created_at", "unknown")
+        print(f"[Cache] ✓ Loaded flood cache ({len(_flood_edge_cache)} entries) from disk (created: {created})")
+        return True
+    except Exception as e:
+        print(f"[Cache] ✗ Failed to load flood cache: {e}")
+        return False
+
+
+def save_route_cache_to_disk() -> bool:
+    """
+    Save route cache to disk for persistence across restarts.
+    Returns True if successful.
+    """
+    global _route_cache
+    if not _route_cache:
+        print("[Cache] No route cache to save")
+        return False
+    
+    try:
+        _ensure_cache_dir()
+        
+        # Convert tuple keys to strings for JSON compatibility
+        export_data = {
+            "version": "1.0",
+            "created_at": datetime.now().isoformat(),
+            "stats": _route_cache_stats,
+            "entries_count": len(_route_cache),
+            "entries": {}
+        }
+        
+        for key, val in _route_cache.items():
+            # key is (origin_lat, origin_lon, dest_lat, dest_lon, flood_idx, route_type)
+            key_str = f"{key[0]},{key[1]}_{key[2]},{key[3]}_{key[4]}_{key[5]}"
+            export_data["entries"][key_str] = {
+                "key_tuple": list(key),
+                "route": val
+            }
+        
+        with open(ROUTE_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(export_data, f)
+        
+        print(f"[Cache] ✓ Saved route cache ({len(_route_cache)} routes) to {ROUTE_CACHE_FILE.name}")
+        return True
+    except Exception as e:
+        print(f"[Cache] ✗ Failed to save route cache: {e}")
+        return False
+
+
+def load_route_cache_from_disk() -> bool:
+    """
+    Load route cache from disk.
+    Returns True if cache was loaded successfully.
+    """
+    global _route_cache, _route_cache_stats
+    
+    if not ROUTE_CACHE_FILE.exists():
+        print(f"[Cache] No route cache file found")
+        return False
+    
+    try:
+        with open(ROUTE_CACHE_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        # Restore stats
+        if "stats" in data:
+            _route_cache_stats = data["stats"]
+        
+        # Convert string keys back to tuples
+        for key_str, entry in data.get("entries", {}).items():
+            key_tuple = tuple(entry["key_tuple"])
+            _route_cache[key_tuple] = entry["route"]
+        
+        created = data.get("created_at", "unknown")
+        print(f"[Cache] ✓ Loaded route cache ({len(_route_cache)} routes) from disk (created: {created})")
+        return True
+    except Exception as e:
+        print(f"[Cache] ✗ Failed to load route cache: {e}")
+        return False
+
+
+def invalidate_caches():
+    """
+    Clear all caches (memory and disk). Call when flood data files change.
+    """
+    global _flood_edge_cache, _route_cache, _route_cache_stats
+    
+    _flood_edge_cache.clear()
+    _route_cache.clear()
+    _route_cache_stats = {"hits": 0, "misses": 0}
+    
+    # Delete disk cache files
+    if FLOOD_CACHE_FILE.exists():
+        FLOOD_CACHE_FILE.unlink()
+    if ROUTE_CACHE_FILE.exists():
+        ROUTE_CACHE_FILE.unlink()
+    
+    print("[Cache] ✓ All caches invalidated (memory and disk)")
+
 
 # ---------------------------
 # Graph load
@@ -294,92 +461,162 @@ def _initialize_travel_time_defaults(G: nx.MultiDiGraph) -> None:
     print(f"[Routing] travel_time initialized for {G.number_of_edges()} edges")
 
 
+# Traffic influence radius in meters - edges within this distance of a traffic point
+# will inherit that point's speed ratio (with distance-based decay)
+TRAFFIC_INFLUENCE_RADIUS_M = getattr(global_config, 'TRAFFIC_INFLUENCE_RADIUS_M', 500)  # default 500m
+
+# Cache for edges within radius of each traffic point
+_traffic_radius_cache: Dict[Tuple[float, float], List[Tuple[int, int, int, float]]] = {}
+
+
+def _find_edges_within_radius(G: nx.MultiDiGraph, lat: float, lon: float, radius_m: float) -> List[Tuple[int, int, int, float]]:
+    """
+    Find all edges within radius_m of a point.
+    Returns list of (u, v, k, distance_m) tuples.
+    """
+    edges_in_radius = []
+    
+    for u, v, k, data in G.edges(keys=True, data=True):
+        # Get edge midpoint (approximate)
+        u_data = G.nodes[u]
+        v_data = G.nodes[v]
+        
+        u_lat = float(u_data.get("y", 0))
+        u_lon = float(u_data.get("x", 0))
+        v_lat = float(v_data.get("y", 0))
+        v_lon = float(v_data.get("x", 0))
+        
+        # Use midpoint of edge
+        mid_lat = (u_lat + v_lat) / 2
+        mid_lon = (u_lon + v_lon) / 2
+        
+        # Calculate distance from traffic point to edge midpoint
+        dist = _haversine_m(lat, lon, mid_lat, mid_lon)
+        
+        if dist <= radius_m:
+            edges_in_radius.append((u, v, k, dist))
+    
+    return edges_in_radius
+
+
+# Traffic assignment strategy options
+TRAFFIC_STRATEGY = "nearest"  # Options: "nearest", "worst", "weighted_average"
+
+
 def apply_traffic_data(G: nx.MultiDiGraph, traffic_points: List[Dict]) -> None:
     """
-    FAST: Only update edges near traffic points (~10 edges).
-    Assumes _initialize_travel_time_defaults was already called.
+    Apply traffic data from monitoring points to ALL nearby edges within radius.
+    
+    Strategy options (set TRAFFIC_STRATEGY above):
+    - "nearest": Use the closest traffic point's data (most accurate)
+    - "worst": Use the slowest speed ratio (conservative, avoids congestion)
+    - "weighted_average": Blend all nearby points by distance (smooth but less accurate)
+    
+    This ensures custom routes passing near traffic points use real speeds
+    instead of default free-flow speeds.
     """
+    global _traffic_radius_cache
     DEFAULT_SPEED_KPH = 30.0
     
     # Ensure defaults are initialized (one-time)
     _initialize_travel_time_defaults(G)
     
-    if not traffic_points or not OSMNX_AVAILABLE:
+    if not traffic_points:
         return
 
-    # VECTORIZED APPROACH
-    lats = []
-    lons = []
-    speeds = []
-    valid_indices = []
-
-    for i, p in enumerate(traffic_points):
+    # Parse traffic points
+    traffic_data = []
+    for p in traffic_points:
         lat = float(p.get("lat") or p.get("query_lat") or 0)
         lon = float(p.get("lon") or p.get("query_lon") or 0)
         sr = float(p.get("speed_ratio", 1.0))
         if not lat or not lon:
             continue
         sr = max(0.1, min(sr, 1.0))
-        
-        lats.append(lat)
-        lons.append(lon)
-        speeds.append(sr)
-        valid_indices.append(i)
+        traffic_data.append((lat, lon, sr))
 
-    if not lats:
+    if not traffic_data:
         return
 
-    # Separate cached vs new points
-    cached_indices = []
-    new_indices = []
-    new_lats = []
-    new_lons = []
-
-    for idx, (lat, lon) in enumerate(zip(lats, lons)):
-        if (lat, lon) in _traffic_cache:
-            cached_indices.append(idx)
-        else:
-            new_indices.append(idx)
-            new_lats.append(lat)
-            new_lons.append(lon)
-
-    # 1. Handle cached points
+    # For each edge, track: {edge_key: [(distance, speed_ratio, decay_factor), ...]}
+    edge_traffic_info: Dict[Tuple[int, int, int], List[Tuple[float, float, float]]] = {}
     count_updated = 0
-    for idx in cached_indices:
-        uvk = _traffic_cache[(lats[idx], lons[idx])]
-        sr = speeds[idx]
+    
+    # Step 1: Collect all traffic points that affect each edge
+    for lat, lon, sr in traffic_data:
+        cache_key = (round(lat, 6), round(lon, 6))
         
-        # update edge
-        data = G.get_edge_data(*uvk)
+        # Check cache for edges within radius
+        if cache_key in _traffic_radius_cache:
+            edges_nearby = _traffic_radius_cache[cache_key]
+        else:
+            # Find all edges within radius (slower, but cached)
+            edges_nearby = _find_edges_within_radius(G, lat, lon, TRAFFIC_INFLUENCE_RADIUS_M)
+            _traffic_radius_cache[cache_key] = edges_nearby
+        
+        # Record this traffic point's influence on each nearby edge
+        for (u, v, k, dist) in edges_nearby:
+            # Distance decay: closer = stronger influence
+            # At 0m: factor = 1.0, at radius: factor = 0.3
+            decay_factor = max(0.3, 1.0 - (dist / TRAFFIC_INFLUENCE_RADIUS_M) * 0.7)
+            
+            uvk = (u, v, k)
+            if uvk not in edge_traffic_info:
+                edge_traffic_info[uvk] = []
+            edge_traffic_info[uvk].append((dist, sr, decay_factor))
+    
+    # Step 2: For each edge, choose the best traffic data based on strategy
+    for uvk, traffic_list in edge_traffic_info.items():
+        
+        if TRAFFIC_STRATEGY == "nearest":
+            # ═══════════════════════════════════════════════════════════════
+            # NEAREST: Use the closest traffic point's speed ratio
+            # Logic: The sensor closest to this road knows its condition best
+            # ═══════════════════════════════════════════════════════════════
+            nearest = min(traffic_list, key=lambda x: x[0])  # x[0] = distance
+            dist, sr, decay = nearest
+            effective_sr = sr * decay + 1.0 * (1 - decay)
+            
+        elif TRAFFIC_STRATEGY == "worst":
+            # ═══════════════════════════════════════════════════════════════
+            # WORST: Use the slowest (lowest) speed ratio
+            # Logic: Conservative - assume worst case to avoid congestion
+            # ═══════════════════════════════════════════════════════════════
+            effective_sr = 1.0
+            for dist, sr, decay in traffic_list:
+                candidate_sr = sr * decay + 1.0 * (1 - decay)
+                if candidate_sr < effective_sr:
+                    effective_sr = candidate_sr
+                    
+        elif TRAFFIC_STRATEGY == "weighted_average":
+            # ═══════════════════════════════════════════════════════════════
+            # WEIGHTED AVERAGE: Blend all nearby points by inverse distance
+            # Logic: Smooth result, but can dilute strong signals
+            # ═══════════════════════════════════════════════════════════════
+            total_weight = 0.0
+            weighted_sum = 0.0
+            for dist, sr, decay in traffic_list:
+                # Weight = inverse distance (closer = higher weight)
+                weight = 1.0 / max(dist, 1.0)  # Avoid division by zero
+                candidate_sr = sr * decay + 1.0 * (1 - decay)
+                weighted_sum += candidate_sr * weight
+                total_weight += weight
+            effective_sr = weighted_sum / total_weight if total_weight > 0 else 1.0
+            
+        else:
+            # Default to nearest
+            nearest = min(traffic_list, key=lambda x: x[0])
+            dist, sr, decay = nearest
+            effective_sr = sr * decay + 1.0 * (1 - decay)
+        
+        # Apply the chosen speed ratio to this edge
+        u, v, k = uvk
+        data = G.get_edge_data(u, v, k)
         if data:
-            _update_edge_traffic(data, sr)
+            _update_edge_traffic(data, effective_sr)
             count_updated += 1
 
-    # 2. Handle new points (bulk)
-    if new_indices:
-        print(f"[Routing] computing nearest edges for {len(new_indices)} new points...")
-        try:
-            ne_nodes = ox.distance.nearest_edges(G, X=new_lons, Y=new_lats)
-            
-            for i, uvk in enumerate(ne_nodes):
-                # cache it
-                orig_idx = new_indices[i]
-                lat = lats[orig_idx]
-                lon = lons[orig_idx]
-                _traffic_cache[(lat, lon)] = uvk
-                
-                # update edge
-                sr = speeds[orig_idx]
-                if len(uvk) < 3: continue
-                data = G.get_edge_data(*uvk)
-                if data:
-                    _update_edge_traffic(data, sr)
-                    count_updated += 1
-                    
-        except Exception as e:
-            print(f"[Routing] Vectorized nearest_edges failed: {e}")
-
-    print(f"[Routing] Updated {count_updated} edges with traffic data (cache hits: {len(cached_indices)})")
+    print(f"[Routing] Updated {count_updated} edges with traffic data (strategy={TRAFFIC_STRATEGY}, radius={TRAFFIC_INFLUENCE_RADIUS_M}m, {len(traffic_data)} points)")
 
 
 def _update_edge_traffic(data: Dict, sr: float):
@@ -626,9 +863,16 @@ def _get_flooded_edges_set(flood_idx: int) -> Set[Tuple[int, int, int]]:
 def precompute_all_flood_data():
     """
     Called at startup to load all flood data into memory.
-    Refined: Only loads flood files that successfully sync with available traffic data.
+    OPTIMIZED: First tries to load from disk cache, skipping expensive computation.
     """
-    print("[Routing] specific: Pre-computing flood intersections (SYNCED with traffic)...")
+    # TRY TO LOAD FROM DISK FIRST (instant startup!)
+    if load_flood_cache_from_disk():
+        print("[Cache] ✓ Using cached flood data - skipping computation!")
+        # Also try to load route cache
+        load_route_cache_from_disk()
+        return  # Done! No need to compute
+    
+    print("[Routing] Computing flood intersections (this will be saved to disk)...")
     flood_dir = PROJECT_ROOT / "web" / "data" / "GEOCODED"
     traffic_dir = PROJECT_ROOT / "collector" / "outputs" / "traffic_snapshots"
     
@@ -755,6 +999,9 @@ def precompute_all_flood_data():
             skipped_count += 1
         
     print(f"[Routing] Pre-computation complete. Cached {cached_count} timestamps (Skipped {skipped_count} unmatched).")
+    
+    # SAVE TO DISK for next startup (instant load!)
+    save_flood_cache_to_disk()
 
 
 def _apply_flood_costs(G: nx.MultiDiGraph, flooded_edges: Set[Tuple[int, int, int]]) -> None:

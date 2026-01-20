@@ -54,7 +54,7 @@ LATEST_TRAFFIC_PATH = WEB_DIR / "data" / "latest_traffic.json"
 # ============================================================================
 # Flask app config
 FLASK_HOST = os.getenv("FLASK_HOST", "0.0.0.0")  # Bind to all interfaces for network access
-FLASK_PORT = int(os.getenv("FLASK_PORT", "9110"))
+FLASK_PORT = int(os.getenv("FLASK_PORT", "8000"))
 FLASK_DEBUG = os.getenv("FLASK_DEBUG", "False").lower() == "true"
 
 # CORS configuration
@@ -80,18 +80,9 @@ if not TOMTOM_API_KEY:
 # COLLECTOR CONFIGURATION
 # ============================================================================
 # Monitoring points for traffic collection
-MONITOR_POINTS = [
-    {"name": "IFFCO Chowk", "lat": 28.4726, "lon": 77.0726},
-    {"name": "MG Road", "lat": 28.4795, "lon": 77.0806},
-    {"name": "Cyber Hub", "lat": 28.4947, "lon": 77.0897},
-    {"name": "Golf Course Rd", "lat": 28.4503, "lon": 77.0972},
-    {"name": "Sohna Road", "lat": 28.4073, "lon": 77.0460},
-    {"name": "NH-48 (Ambience)", "lat": 28.5052, "lon": 77.0970},
-    {"name": "Rajiv Chowk", "lat": 28.4691, "lon": 77.0366},
-    {"name": "Huda City Centre", "lat": 28.4595, "lon": 77.0722},
-    {"name": "Sector 56", "lat": 28.4244, "lon": 77.1070},
-    {"name": "Manesar Rd", "lat": 28.3540, "lon": 76.9440},
-]
+# `MONITOR_POINTS` will be populated from `PRESET_LOCATIONS` defined
+# later in this file so the web UI and collector stay in sync.
+MONITOR_POINTS = []
 
 COLLECTOR_INTERVAL_MIN = int(os.getenv("COLLECTOR_INTERVAL_MIN", "10"))
 
@@ -104,6 +95,11 @@ FLOOD_PENALTY = float(os.getenv("FLOOD_PENALTY", "1000000.0"))
 
 # Route cache settings
 MAX_ROUTE_CACHE_SIZE = int(os.getenv("MAX_ROUTE_CACHE_SIZE", "500"))
+
+# Persistent cache directory (survives server restarts)
+CACHE_DIR = WEB_DIR / "data" / "cache"
+FLOOD_CACHE_FILE = CACHE_DIR / "flood_cache.json"
+ROUTE_CACHE_FILE = CACHE_DIR / "route_cache.json"
 
 # ============================================================================
 # GEOPANDAS AND SPATIAL LIBRARIES
@@ -132,19 +128,42 @@ except ImportError:
 TIMES_START = os.getenv("TIMES_START", "2025-07-13T11:25")
 TIMES_END = os.getenv("TIMES_END", "2025-07-13T18:17")
 
-# Preset locations for web UI
+# Preset locations for web UI (expanded to match web/app.js 25 hotspots)
 PRESET_LOCATIONS = {
-    "iffco": {"name": "IFFCO Chowk", "lat": 28.4726, "lon": 77.0726},
-    "mgroad": {"name": "MG Road", "lat": 28.4795, "lon": 77.0806},
-    "cyberhub": {"name": "Cyber Hub", "lat": 28.4947, "lon": 77.0897},
-    "golfcourse": {"name": "Golf Course Rd", "lat": 28.4503, "lon": 77.0972},
-    "sohna": {"name": "Sohna Road", "lat": 28.4073, "lon": 77.0460},
-    "nh48": {"name": "NH-48 (Ambience)", "lat": 28.5052, "lon": 77.0970},
-    "rajiv": {"name": "Rajiv Chowk", "lat": 28.4691, "lon": 77.0366},
-    "huda": {"name": "Huda City Centre", "lat": 28.4595, "lon": 77.0722},
-    "sector56": {"name": "Sector 56", "lat": 28.4244, "lon": 77.1070},
-    "manesar": {"name": "Manesar Rd", "lat": 28.3540, "lon": 76.9440},
+    "iffco_chowk": {"name": "IFFCO Chowk", "lat": 28.477564199478913, "lon": 77.06859985177209},
+    "rajiv_chowk": {"name": "Rajiv Chowk", "lat": 28.445292087715444, "lon": 77.03318302971367},
+    "hero_honda": {"name": "Hero Honda Chowk", "lat": 28.429572485292674, "lon": 77.02009547931516},
+    "kherki_daula": {"name": "Kherki Daula Toll Plaza", "lat": 28.395715221700556, "lon": 76.98214491369943},
+    "signature_tower": {"name": "Signature Tower", "lat": 28.462211223747214, "lon": 77.0489446912307},
+    "shankar_chowk": {"name": "Shankar Chowk / Cyber City", "lat": 28.508064947117724, "lon": 77.08211742534732},
+    "sikanderpur": {"name": "Sikanderpur Metro", "lat": 28.481187691171193, "lon": 77.09425732449982},
+    "huda_city": {"name": "HUDA City Centre Metro", "lat": 28.459382783815194, "lon": 77.07285799465937},
+    "subhash_chowk": {"name": "Subhash Chowk", "lat": 28.428861106525773, "lon": 77.03711785417951},
+    "jharsa_chowk": {"name": "Jharsa Chowk", "lat": 28.454834178543077, "lon": 77.04244784380403},
+    "atul_kataria": {"name": "Atul Kataria Chowk", "lat": 28.481183722468575, "lon": 77.04867463883903},
+    "mahavir_chowk": {"name": "Mahavir Chowk", "lat": 28.463656522868447, "lon": 77.03413268301684},
+    "ghata_chowk": {"name": "Ghata Chowk", "lat": 28.421982117566415, "lon": 77.10973463698622},
+    "vatika_chowk": {"name": "Vatika Chowk (SPR-Sohna Rd)", "lat": 28.404865793781532, "lon": 77.04204962349263},
+    "badshahpur": {"name": "Badshahpur / Sohna Rd junction", "lat": 28.35048237859808, "lon": 77.0655043369831},
+    "ambedkar_chowk": {"name": "Ambedkar Chowk", "lat": 28.437148333410683, "lon": 77.0674060560299},
+    "dundahera": {"name": "Dundahera Hanuman Mandir (Old Delhi Rd)", "lat": 28.511407097088824, "lon": 77.07777883884035},
+    "dwarka_nh48": {"name": "Dwarka Expwy-NH48 Cloverleaf", "lat": 28.40601139485718, "lon": 76.9902767658213},
+    "sector31": {"name": "Sector 31 Signal / Market", "lat": 28.456542851852696, "lon": 77.04977988988432},
+    "old_bus_stand": {"name": "Old Gurgaon Bus Stand", "lat": 28.466952871185878, "lon": 77.03269036613194},
+    "imt_manesar": {"name": "IMT Manesar Junction", "lat": 28.360673595292468, "lon": 76.93919787004663},
+    "golf_course": {"name": "Golf Course Rd - One Horizon", "lat": 28.4513013391806, "lon": 77.09741156582324},
+    "sector56_57": {"name": "Sector 56/57 - Golf Course Extn", "lat": 28.448653219922612, "lon": 77.09931976915546},
+    "sohna_entry": {"name": "Sohna Town Entry", "lat": 28.419803693042986, "lon": 77.04230448203113},
+    "pataudi_rd": {"name": "Pataudi Rd - Sector 89/90", "lat": 28.427631686155653, "lon": 76.94592366161731}
 }
+
+# Derive collector monitor points from the web preset locations so both stay in sync
+MONITOR_POINTS = list(PRESET_LOCATIONS.values())
+
+# Traffic influence radius - edges within this distance of a traffic monitoring point
+# will inherit that point's speed ratio (with distance-based decay)
+# Larger radius = more edges affected, but slower computation on first run
+TRAFFIC_INFLUENCE_RADIUS_M = float(os.getenv("TRAFFIC_INFLUENCE_RADIUS_M", "500"))
 
 # Default map center and zoom
 DEFAULT_MAP_CENTER = [28.4595, 77.0266]

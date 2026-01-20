@@ -1,52 +1,52 @@
 {
-  "generated_at_utc": "2026-01-20T11:00:14.284682+00:00",
-  "generated_at_local": "2026-01-20 16:30:14",
+  "generated_at_utc": "2026-01-20T08:36:20.319716+00:00",
+  "generated_at_local": "2026-01-20 14:06:20",
   "count": 25,
   "points": [
     {
-      "currentSpeed_kmph": 30,
-      "freeFlowSpeed_kmph": 38,
-      "currentTravelTime_s": 1835,
-      "freeFlowTravelTime_s": 1448,
-      "delay_s": 387,
-      "speed_ratio": 0.7894736842105263,
+      "currentSpeed_kmph": 33,
+      "freeFlowSpeed_kmph": 37,
+      "currentTravelTime_s": 1668,
+      "freeFlowTravelTime_s": 1488,
+      "delay_s": 180,
+      "speed_ratio": 0.8918918918918919,
       "confidence": 1,
       "frc": "FRC2",
       "name": "IFFCO Chowk",
       "query_lat": 28.477564199478913,
       "query_lon": 77.06859985177209,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 22,
+      "currentSpeed_kmph": 24,
       "freeFlowSpeed_kmph": 32,
-      "currentTravelTime_s": 222,
+      "currentTravelTime_s": 203,
       "freeFlowTravelTime_s": 152,
-      "delay_s": 70,
-      "speed_ratio": 0.6875,
+      "delay_s": 51,
+      "speed_ratio": 0.75,
       "confidence": 1,
       "frc": "FRC2",
       "name": "Rajiv Chowk",
       "query_lat": 28.445292087715444,
       "query_lon": 77.03318302971367,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 30,
-      "freeFlowSpeed_kmph": 36,
-      "currentTravelTime_s": 1686,
-      "freeFlowTravelTime_s": 1405,
-      "delay_s": 281,
-      "speed_ratio": 0.8333333333333334,
+      "currentSpeed_kmph": 32,
+      "freeFlowSpeed_kmph": 35,
+      "currentTravelTime_s": 1581,
+      "freeFlowTravelTime_s": 1445,
+      "delay_s": 136,
+      "speed_ratio": 0.9142857142857143,
       "confidence": 1,
       "frc": "FRC3",
       "name": "Hero Honda Chowk",
       "query_lat": 28.429572485292674,
       "query_lon": 77.02009547931516,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
       "currentSpeed_kmph": 59,
@@ -60,53 +60,53 @@
       "name": "Kherki Daula Toll Plaza",
       "query_lat": 28.395715221700556,
       "query_lon": 76.98214491369943,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 44,
-      "freeFlowSpeed_kmph": 57,
-      "currentTravelTime_s": 1653,
-      "freeFlowTravelTime_s": 1276,
-      "delay_s": 377,
-      "speed_ratio": 0.7719298245614035,
+      "currentSpeed_kmph": 58,
+      "freeFlowSpeed_kmph": 58,
+      "currentTravelTime_s": 1254,
+      "freeFlowTravelTime_s": 1254,
+      "delay_s": 0,
+      "speed_ratio": 1.0,
       "confidence": 1,
       "frc": "FRC1",
       "name": "Signature Tower",
       "query_lat": 28.462211223747214,
       "query_lon": 77.0489446912307,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 22,
+      "currentSpeed_kmph": 21,
       "freeFlowSpeed_kmph": 29,
-      "currentTravelTime_s": 1909,
+      "currentTravelTime_s": 2000,
       "freeFlowTravelTime_s": 1448,
-      "delay_s": 461,
-      "speed_ratio": 0.7586206896551724,
-      "confidence": 0.998407,
+      "delay_s": 552,
+      "speed_ratio": 0.7241379310344828,
+      "confidence": 0.994416,
       "frc": "FRC4",
       "name": "Shankar Chowk / Cyber City",
       "query_lat": 28.508064947117724,
       "query_lon": 77.08211742534732,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 33,
-      "freeFlowSpeed_kmph": 41,
-      "currentTravelTime_s": 1462,
-      "freeFlowTravelTime_s": 1177,
-      "delay_s": 285,
-      "speed_ratio": 0.8048780487804879,
+      "currentSpeed_kmph": 40,
+      "freeFlowSpeed_kmph": 40,
+      "currentTravelTime_s": 1206,
+      "freeFlowTravelTime_s": 1206,
+      "delay_s": 0,
+      "speed_ratio": 1.0,
       "confidence": 1,
       "frc": "FRC3",
       "name": "Sikanderpur Metro",
       "query_lat": 28.481187691171193,
       "query_lon": 77.09425732449982,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
       "currentSpeed_kmph": 9,
@@ -120,8 +120,8 @@
       "name": "HUDA City Centre Metro",
       "query_lat": 28.459382783815194,
       "query_lon": 77.07285799465937,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
       "currentSpeed_kmph": 32,
@@ -135,38 +135,38 @@
       "name": "Subhash Chowk",
       "query_lat": 28.428861106525773,
       "query_lon": 77.03711785417951,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 44,
-      "freeFlowSpeed_kmph": 57,
-      "currentTravelTime_s": 1653,
-      "freeFlowTravelTime_s": 1276,
-      "delay_s": 377,
-      "speed_ratio": 0.7719298245614035,
+      "currentSpeed_kmph": 58,
+      "freeFlowSpeed_kmph": 58,
+      "currentTravelTime_s": 1254,
+      "freeFlowTravelTime_s": 1254,
+      "delay_s": 0,
+      "speed_ratio": 1.0,
       "confidence": 1,
       "frc": "FRC1",
       "name": "Jharsa Chowk",
       "query_lat": 28.454834178543077,
       "query_lon": 77.04244784380403,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 19,
+      "currentSpeed_kmph": 21,
       "freeFlowSpeed_kmph": 27,
-      "currentTravelTime_s": 1909,
+      "currentTravelTime_s": 1728,
       "freeFlowTravelTime_s": 1344,
-      "delay_s": 565,
-      "speed_ratio": 0.7037037037037037,
+      "delay_s": 384,
+      "speed_ratio": 0.7777777777777778,
       "confidence": 1,
       "frc": "FRC4",
       "name": "Atul Kataria Chowk",
       "query_lat": 28.481183722468575,
       "query_lon": 77.04867463883903,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
       "currentSpeed_kmph": 31,
@@ -180,38 +180,38 @@
       "name": "Mahavir Chowk",
       "query_lat": 28.463656522868447,
       "query_lon": 77.03413268301684,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 31,
-      "freeFlowSpeed_kmph": 39,
-      "currentTravelTime_s": 301,
-      "freeFlowTravelTime_s": 239,
-      "delay_s": 62,
-      "speed_ratio": 0.7948717948717948,
+      "currentSpeed_kmph": 40,
+      "freeFlowSpeed_kmph": 40,
+      "currentTravelTime_s": 233,
+      "freeFlowTravelTime_s": 233,
+      "delay_s": 0,
+      "speed_ratio": 1.0,
       "confidence": 1,
       "frc": "FRC3",
       "name": "Ghata Chowk",
       "query_lat": 28.421982117566415,
       "query_lon": 77.10973463698622,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 32,
-      "freeFlowSpeed_kmph": 40,
-      "currentTravelTime_s": 955,
-      "freeFlowTravelTime_s": 764,
-      "delay_s": 191,
-      "speed_ratio": 0.8,
+      "currentSpeed_kmph": 29,
+      "freeFlowSpeed_kmph": 39,
+      "currentTravelTime_s": 1054,
+      "freeFlowTravelTime_s": 783,
+      "delay_s": 271,
+      "speed_ratio": 0.7435897435897436,
       "confidence": 1,
       "frc": "FRC2",
       "name": "Vatika Chowk (SPR-Sohna Rd)",
       "query_lat": 28.404865793781532,
       "query_lon": 77.04204962349263,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
       "currentSpeed_kmph": 42,
@@ -225,38 +225,38 @@
       "name": "Badshahpur / Sohna Rd junction",
       "query_lat": 28.35048237859808,
       "query_lon": 77.0655043369831,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 26,
+      "currentSpeed_kmph": 25,
       "freeFlowSpeed_kmph": 32,
-      "currentTravelTime_s": 1318,
+      "currentTravelTime_s": 1371,
       "freeFlowTravelTime_s": 1071,
-      "delay_s": 247,
-      "speed_ratio": 0.8125,
-      "confidence": 1,
+      "delay_s": 300,
+      "speed_ratio": 0.78125,
+      "confidence": 0.997324,
       "frc": "FRC4",
       "name": "Ambedkar Chowk",
       "query_lat": 28.437148333410683,
       "query_lon": 77.0674060560299,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 22,
+      "currentSpeed_kmph": 21,
       "freeFlowSpeed_kmph": 29,
-      "currentTravelTime_s": 1909,
+      "currentTravelTime_s": 2000,
       "freeFlowTravelTime_s": 1448,
-      "delay_s": 461,
-      "speed_ratio": 0.7586206896551724,
-      "confidence": 0.998407,
+      "delay_s": 552,
+      "speed_ratio": 0.7241379310344828,
+      "confidence": 0.994416,
       "frc": "FRC4",
       "name": "Dundahera Hanuman Mandir (Old Delhi Rd)",
       "query_lat": 28.511407097088824,
       "query_lon": 77.07777883884035,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
       "currentSpeed_kmph": 61,
@@ -270,38 +270,38 @@
       "name": "Dwarka Expwy-NH48 Cloverleaf",
       "query_lat": 28.40601139485718,
       "query_lon": 76.9902767658213,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 44,
-      "freeFlowSpeed_kmph": 57,
-      "currentTravelTime_s": 1653,
-      "freeFlowTravelTime_s": 1276,
-      "delay_s": 377,
-      "speed_ratio": 0.7719298245614035,
+      "currentSpeed_kmph": 58,
+      "freeFlowSpeed_kmph": 58,
+      "currentTravelTime_s": 1254,
+      "freeFlowTravelTime_s": 1254,
+      "delay_s": 0,
+      "speed_ratio": 1.0,
       "confidence": 1,
       "frc": "FRC1",
       "name": "Sector 31 Signal / Market",
       "query_lat": 28.456542851852696,
       "query_lon": 77.04977988988432,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 19,
+      "currentSpeed_kmph": 21,
       "freeFlowSpeed_kmph": 27,
-      "currentTravelTime_s": 1909,
+      "currentTravelTime_s": 1728,
       "freeFlowTravelTime_s": 1344,
-      "delay_s": 565,
-      "speed_ratio": 0.7037037037037037,
+      "delay_s": 384,
+      "speed_ratio": 0.7777777777777778,
       "confidence": 1,
       "frc": "FRC4",
       "name": "Old Gurgaon Bus Stand",
       "query_lat": 28.466952871185878,
       "query_lon": 77.03269036613194,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
       "currentSpeed_kmph": 33,
@@ -315,8 +315,8 @@
       "name": "IMT Manesar Junction",
       "query_lat": 28.360673595292468,
       "query_lon": 76.93919787004663,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
       "currentSpeed_kmph": 16,
@@ -330,8 +330,8 @@
       "name": "Golf Course Rd - One Horizon",
       "query_lat": 28.4513013391806,
       "query_lon": 77.09741156582324,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
       "currentSpeed_kmph": 37,
@@ -345,23 +345,23 @@
       "name": "Sector 56/57 - Golf Course Extn",
       "query_lat": 28.448653219922612,
       "query_lon": 77.09931976915546,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
-      "currentSpeed_kmph": 26,
+      "currentSpeed_kmph": 25,
       "freeFlowSpeed_kmph": 32,
-      "currentTravelTime_s": 1318,
+      "currentTravelTime_s": 1371,
       "freeFlowTravelTime_s": 1071,
-      "delay_s": 247,
-      "speed_ratio": 0.8125,
-      "confidence": 1,
+      "delay_s": 300,
+      "speed_ratio": 0.78125,
+      "confidence": 0.997324,
       "frc": "FRC4",
       "name": "Sohna Town Entry",
       "query_lat": 28.419803693042986,
       "query_lon": 77.04230448203113,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     },
     {
       "currentSpeed_kmph": 36,
@@ -375,8 +375,8 @@
       "name": "Pataudi Rd - Sector 89/90",
       "query_lat": 28.427631686155653,
       "query_lon": 76.94592366161731,
-      "timestamp_utc": "2026-01-20T11:00:14.284682+00:00",
-      "timestamp_local": "2026-01-20 16:30:14"
+      "timestamp_utc": "2026-01-20T08:36:20.319716+00:00",
+      "timestamp_local": "2026-01-20 14:06:20"
     }
   ]
 }

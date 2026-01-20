@@ -21,3 +21,4 @@ venv/
 Thumbs.db
 
 web/data/
+*.ipynb

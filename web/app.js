@@ -3,7 +3,7 @@ console.log("APP.JS LOADED:", new Date().toISOString());
 /* =========================
    CONFIG
 ========================= */
-const API_BASE = "http://localhost:9110";
+const API_BASE = "http://localhost:8000";
 
 // Filter to match traffic data window: 11:25 AM to 6:17 PM (18:17)
 // Using July 13, 2025 dates from flood files but matching the time window
@@ -13,18 +13,297 @@ const FLOOD_ROADS_URL = (i) => `${API_BASE}/api/flood-roads?time=${encodeURIComp
 const TRAFFIC_SNAPSHOT_URL = (timeIdx = null) =>
   timeIdx !== null ? `${API_BASE}/api/traffic?time=${encodeURIComponent(timeIdx)}` : `${API_BASE}/api/traffic`;
 
-// Preset locations
+/* =========================
+   TRAFFIC HISTORY FOR CHART
+========================= */
+const trafficHistory = [];
+const MAX_HISTORY_POINTS = 12;
+let trafficTrendChart = null;
+
+/* =========================
+   DARK MODE TOGGLE
+========================= */
+function initDarkMode() {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    updateDarkModeIcon(true);
+  }
+}
+
+function toggleDarkMode() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  
+  if (isDark) {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('theme', 'light');
+    updateDarkModeIcon(false);
+    showToast('Light mode enabled', 'info', 'Theme Changed');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
+    updateDarkModeIcon(true);
+    showToast('Dark mode enabled', 'info', 'Theme Changed');
+  }
+}
+
+function updateDarkModeIcon(isDark) {
+  const icon = document.querySelector('.mode-icon');
+  if (icon) {
+    icon.textContent = isDark ? '☀️' : '🌙';
+  }
+}
+
+// Initialize dark mode on load
+initDarkMode();
+
+/* =========================
+   TOAST NOTIFICATIONS
+========================= */
+let lastAlertTime = 0;
+const ALERT_COOLDOWN = 60000; // 1 minute cooldown between alerts
+
+function showToast(message, type = 'error', title = 'Alert') {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+
+  const icons = {
+    error: '🚨',
+    warning: '⚠️',
+    success: '✅',
+    info: 'ℹ️'
+  };
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon">${icons[type] || icons.info}</span>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+  `;
+  
+  container.appendChild(toast);
+  
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.remove();
+    }
+  }, 5000);
+}
+
+function checkTrafficAlerts(heavy, moderate) {
+  const now = Date.now();
+  
+  // Cooldown to prevent spam
+  if (now - lastAlertTime < ALERT_COOLDOWN) return;
+  
+  if (heavy >= 3) {
+    showToast(
+      `${heavy} locations with heavy traffic detected!`,
+      'error',
+      'Heavy Traffic Alert'
+    );
+    lastAlertTime = now;
+  } else if (moderate >= 12) {
+    showToast(
+      `${moderate} locations with moderate congestion`,
+      'warning', 
+      'Traffic Advisory'
+    );
+    lastAlertTime = now;
+  }
+}
+
+/* =========================
+   TRAFFIC TREND CHART
+========================= */
+function initTrafficTrendChart() {
+  const ctx = document.getElementById('trafficTrendChart');
+  if (!ctx || trafficTrendChart) return;
+
+  trafficTrendChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: 'Smooth',
+          data: [],
+          borderColor: '#22c55e',
+          backgroundColor: 'rgba(34, 197, 94, 0.2)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 0
+        },
+        {
+          label: 'Moderate',
+          data: [],
+          borderColor: '#f59e0b',
+          backgroundColor: 'rgba(245, 158, 11, 0.2)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 0
+        },
+        {
+          label: 'Heavy',
+          data: [],
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.2)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          mode: 'index',
+          intersect: false,
+          padding: 8,
+          titleFont: { size: 11 },
+          bodyFont: { size: 10 }
+        }
+      },
+      scales: {
+        x: { display: false },
+        y: { display: false, beginAtZero: true }
+      },
+      interaction: {
+        mode: 'nearest',
+        axis: 'x',
+        intersect: false
+      }
+    }
+  });
+  
+  console.log("[Chart] Traffic trend chart initialized");
+}
+
+function updateTrafficTrendChart(smooth, moderate, heavy) {
+  if (!trafficTrendChart) {
+    initTrafficTrendChart();
+    if (!trafficTrendChart) return;
+  }
+
+  const now = new Date();
+  const timeLabel = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+  // Add new data point
+  trafficHistory.push({ time: timeLabel, smooth, moderate, heavy });
+  
+  // Keep only last N points
+  if (trafficHistory.length > MAX_HISTORY_POINTS) {
+    trafficHistory.shift();
+  }
+
+  // Update chart
+  trafficTrendChart.data.labels = trafficHistory.map(h => h.time);
+  trafficTrendChart.data.datasets[0].data = trafficHistory.map(h => h.smooth);
+  trafficTrendChart.data.datasets[1].data = trafficHistory.map(h => h.moderate);
+  trafficTrendChart.data.datasets[2].data = trafficHistory.map(h => h.heavy);
+  
+  trafficTrendChart.update('none');
+}
+
+/* =========================
+   TRAFFIC STATUS COUNTS - For Header Cards
+========================= */
+function updateTrafficStatusCounts(points) {
+  let smooth = 0, moderate = 0, heavy = 0;
+  
+  if (points && Array.isArray(points)) {
+    points.forEach(p => {
+      const sr = Number(p.speed_ratio ?? 0);
+      if (sr >= 0.85) smooth++;
+      else if (sr >= 0.65) moderate++;
+      else heavy++;
+    });
+  }
+  
+  // Update the status cards
+  const smoothEl = document.getElementById("smoothCount");
+  const moderateEl = document.getElementById("moderateCount");
+  const heavyEl = document.getElementById("heavyCount");
+  
+  if (smoothEl) smoothEl.textContent = smooth;
+  if (moderateEl) moderateEl.textContent = moderate;
+  if (heavyEl) heavyEl.textContent = heavy;
+  
+  // ★ Update traffic trend chart
+  updateTrafficTrendChart(smooth, moderate, heavy);
+  
+  // ★ Check for alerts
+  checkTrafficAlerts(heavy, moderate);
+  
+  console.log(`[Traffic Status] Smooth: ${smooth}, Moderate: ${moderate}, Heavy: ${heavy}`);
+}
+
+/* =========================
+   HEADER TIME UPDATE
+========================= */
+function updateHeaderTime() {
+  const el = document.getElementById("headerTime");
+  if (el) {
+    const now = new Date();
+    el.textContent = now.toLocaleTimeString('en-IN', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  }
+}
+
+// Update header time every minute
+setInterval(updateHeaderTime, 60000);
+updateHeaderTime(); // Initial call
+
+// Wire up dark mode toggle
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('darkModeToggle')?.addEventListener('click', toggleDarkMode);
+  
+  // Initialize chart after short delay
+  setTimeout(initTrafficTrendChart, 1000);
+});
+
+// 25 Traffic Hotspots for Gurugram
 const PRESET_LOCATIONS = {
-  iffco: { name: "IFFCO Chowk", lat: 28.4726, lon: 77.0726 },
-  mgroad: { name: "MG Road", lat: 28.4795, lon: 77.0806 },
-  cyberhub: { name: "Cyber Hub", lat: 28.4947, lon: 77.0897 },
-  golfcourse: { name: "Golf Course Rd", lat: 28.4503, lon: 77.0972 },
-  sohna: { name: "Sohna Road", lat: 28.4073, lon: 77.046 },
-  nh48: { name: "NH-48 (Ambience)", lat: 28.5052, lon: 77.097 },
-  rajiv: { name: "Rajiv Chowk", lat: 28.4691, lon: 77.0366 },
-  huda: { name: "Huda City Centre", lat: 28.4595, lon: 77.0722 },
-  sector56: { name: "Sector 56", lat: 28.4244, lon: 77.107 },
-  manesar: { name: "Manesar Rd", lat: 28.354, lon: 76.944 }
+  iffco_chowk: { name: "IFFCO Chowk", lat: 28.477564199478913, lon: 77.06859985177209 },
+  rajiv_chowk: { name: "Rajiv Chowk", lat: 28.445292087715444, lon: 77.03318302971367 },
+  hero_honda: { name: "Hero Honda Chowk", lat: 28.429572485292674, lon: 77.02009547931516 },
+  kherki_daula: { name: "Kherki Daula Toll Plaza", lat: 28.395715221700556, lon: 76.98214491369943 },
+  signature_tower: { name: "Signature Tower", lat: 28.462211223747214, lon: 77.0489446912307 },
+  shankar_chowk: { name: "Shankar Chowk / Cyber City", lat: 28.508064947117724, lon: 77.08211742534732 },
+  sikanderpur: { name: "Sikanderpur Metro", lat: 28.481187691171193, lon: 77.09425732449982 },
+  huda_city: { name: "HUDA City Centre Metro", lat: 28.459382783815194, lon: 77.07285799465937 },
+  subhash_chowk: { name: "Subhash Chowk", lat: 28.428861106525773, lon: 77.03711785417951 },
+  jharsa_chowk: { name: "Jharsa Chowk", lat: 28.454834178543077, lon: 77.04244784380403 },
+  atul_kataria: { name: "Atul Kataria Chowk", lat: 28.481183722468575, lon: 77.04867463883903 },
+  mahavir_chowk: { name: "Mahavir Chowk", lat: 28.463656522868447, lon: 77.03413268301684 },
+  ghata_chowk: { name: "Ghata Chowk", lat: 28.421982117566415, lon: 77.10973463698622 },
+  vatika_chowk: { name: "Vatika Chowk (SPR-Sohna Rd)", lat: 28.404865793781532, lon: 77.04204962349263 },
+  badshahpur: { name: "Badshahpur / Sohna Rd junction", lat: 28.35048237859808, lon: 77.0655043369831 },
+  ambedkar_chowk: { name: "Ambedkar Chowk", lat: 28.437148333410683, lon: 77.0674060560299 },
+  dundahera: { name: "Dundahera Hanuman Mandir (Old Delhi Rd)", lat: 28.511407097088824, lon: 77.07777883884035 },
+  dwarka_nh48: { name: "Dwarka Expwy-NH48 Cloverleaf", lat: 28.40601139485718, lon: 76.9902767658213 },
+  sector31: { name: "Sector 31 Signal / Market", lat: 28.456542851852696, lon: 77.04977988988432 },
+  old_bus_stand: { name: "Old Gurgaon Bus Stand", lat: 28.466952871185878, lon: 77.03269036613194 },
+  imt_manesar: { name: "IMT Manesar Junction", lat: 28.360673595292468, lon: 76.93919787004663 },
+  golf_course: { name: "Golf Course Rd - One Horizon", lat: 28.4513013391806, lon: 77.09741156582324 },
+  sector56_57: { name: "Sector 56/57 - Golf Course Extn", lat: 28.448653219922612, lon: 77.09931976915546 },
+  sohna_entry: { name: "Sohna Town Entry", lat: 28.419803693042986, lon: 77.04230448203113 },
+  pataudi_rd: { name: "Pataudi Rd - Sector 89/90", lat: 28.427631686155653, lon: 76.94592366161731 }
 };
 
 /* =========================
@@ -332,19 +611,35 @@ function formatLabel(fullLabel, showDate) {
   }
 }
 
+// In-memory cache for flood layers (key: "mode_index", value: geojson)
+const floodDataCache = {};
+
 async function loadFloodLayerByIndex(idx) {
   try {
     currentFloodIndex = Number(idx);
     setFloodTimeLabel(currentFloodIndex);
 
     const mode = getFloodMode();
-    const url = mode === "polygons" ? FLOOD_POLY_URL(currentFloodIndex) : FLOOD_ROADS_URL(currentFloodIndex);
+    const cacheKey = `${mode}_${currentFloodIndex}`;
 
-    const res = await fetch(url, { cache: "no-store" });
-    const geojson = await res.json();
+    let geojson;
 
-    if (!res.ok) throw new Error(geojson?.error || `Flood fetch failed: ${res.status}`);
-    if (geojson?.error) throw new Error(geojson.error);
+    // Check in-memory cache first
+    if (floodDataCache[cacheKey]) {
+      console.log(`[Flood] Using cached data for index ${currentFloodIndex}`);
+      geojson = floodDataCache[cacheKey];
+    } else {
+      const url = mode === "polygons" ? FLOOD_POLY_URL(currentFloodIndex) : FLOOD_ROADS_URL(currentFloodIndex);
+      const res = await fetch(url);  // Allow browser caching (removed no-store)
+      geojson = await res.json();
+
+      if (!res.ok) throw new Error(geojson?.error || `Flood fetch failed: ${res.status}`);
+      if (geojson?.error) throw new Error(geojson.error);
+
+      // Store in cache
+      floodDataCache[cacheKey] = geojson;
+      console.log(`[Flood] Cached data for index ${currentFloodIndex}`);
+    }
 
     if (floodLayer && map.hasLayer(floodLayer)) map.removeLayer(floodLayer);
 
@@ -360,11 +655,11 @@ async function loadFloodLayerByIndex(idx) {
       // extra safety
       pointToLayer: () => null,
 
-      // Solid blue for ALL flooded roads
+      // Light sky blue for flooded roads (distinct from route blue)
       style: {
-        color: "#3b82f6",  // blue
-        weight: 3,
-        opacity: 0.8
+        color: "#38BDF8",  // Light sky blue (Tailwind sky-400)
+        weight: 4,
+        opacity: 0.9
       }
     });
 
@@ -436,6 +731,9 @@ async function loadTrafficSnapshot(timeIdx = null) {
 
     const points = trafficSnapshot.points || [];
     const updated = trafficSnapshot.generated_at_local || formatTimeNice(trafficSnapshot.generated_at_utc);
+
+    // ★ UPDATE TRAFFIC STATUS CARDS IN HEADER
+    updateTrafficStatusCounts(points);
 
     if (statusEl) {
       const timeInfo = timeIdx !== null ? ` (synced to timeline index ${timeIdx})` : "";
@@ -558,12 +856,12 @@ async function handleSearch() {
 /* =========================
    ROUTING - Multi-route comparison
 ========================= */
-// Route colors config
+// Route colors - avoiding traffic colors (green/red/orange in traffic)
 const ROUTE_COLORS = {
-  shortest: "#8b5cf6",    // purple
-  fastest: "#6a340dff",     // brown
-  flood_avoid: "#006400", // dark green (changed for visibility)
-  smart: "#000000"        // black
+  shortest: "#673AB7",    // Purple
+  fastest: "#E91E63",     // Pink/Magenta
+  flood_avoid: "#1B5E20", // Dark Green
+  smart: "#000000"        // Black
 };
 
 const ROUTE_WEIGHTS = {
@@ -595,8 +893,14 @@ let routeDestination = null;
 let clickMode = null;
 
 function setRouteStatus(msg) {
-  const el = document.getElementById("routeStatus");
-  if (el) el.textContent = msg || "";
+  const el = document.getElementById("routeSearchStatus");
+  if (el) {
+    el.textContent = msg || "";
+    // Reset color if clearing
+    if (!msg) el.style.color = "";
+    // If success message (starts with ✅), make it green/blue
+    if (msg && msg.startsWith("✅")) el.style.color = "#10b981";
+  }
 }
 
 function clearRoutes() {
@@ -809,8 +1113,8 @@ async function calculateAllRoutes() {
   });
 
   if (successCount > 0) {
-    setRouteStatus(`${successCount} route(s) ready`);
-    setTimeout(() => setRouteStatus(""), 2000);
+    setRouteStatus(`✅ ${successCount} route(s) ready`);
+    setTimeout(() => setRouteStatus(""), 1500);  // Hide quickly
   } else {
     setRouteStatus("No routes found");
   }
@@ -1069,6 +1373,62 @@ document.addEventListener("DOMContentLoaded", () => {
     restoreLayerVisibility();
   });
 
+  // ★ TIME STEP BUTTONS (Prev/Next)
+  const timePrevBtn = document.getElementById("timePrevBtn");
+  const timeNextBtn = document.getElementById("timeNextBtn");
+
+  async function stepSlider(direction) {
+    const slider = document.getElementById("floodTimeSlider");
+    if (!slider) return;
+
+    const min = Number(slider.min);
+    const max = Number(slider.max);
+    const current = Number(slider.value);
+    const newValue = direction === "prev" 
+      ? Math.max(min, current - 1) 
+      : Math.min(max, current + 1);
+
+    if (newValue !== current) {
+      slider.value = newValue;
+      setFloodTimeLabel(newValue);
+      await Promise.all([
+        loadFloodLayerByIndex(newValue),
+        loadTrafficSnapshot(newValue)
+      ]);
+      if (routeOrigin && routeDestination) await calculateRouteSingle();
+      restoreLayerVisibility();
+    }
+  }
+
+  timePrevBtn?.addEventListener("click", () => stepSlider("prev"));
+  timeNextBtn?.addEventListener("click", () => stepSlider("next"));
+
+  // ★ QUICK JUMP BUTTONS (Start/Middle/End)
+  document.querySelectorAll(".time-quick-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const slider = document.getElementById("floodTimeSlider");
+      if (!slider) return;
+
+      const min = Number(slider.min);
+      const max = Number(slider.max);
+      const jumpTo = btn.dataset.jump;
+
+      let newValue;
+      if (jumpTo === "start") newValue = min;
+      else if (jumpTo === "end") newValue = max;
+      else newValue = Math.round((min + max) / 2); // middle
+
+      slider.value = newValue;
+      setFloodTimeLabel(newValue);
+      await Promise.all([
+        loadFloodLayerByIndex(newValue),
+        loadTrafficSnapshot(newValue)
+      ]);
+      if (routeOrigin && routeDestination) await calculateRouteSingle();
+      restoreLayerVisibility();
+    });
+  });
+
   document.getElementById("reloadFloodButton")?.addEventListener("click", async () => {
     await loadFloodTimeline();
     restoreLayerVisibility();
@@ -1212,3 +1572,267 @@ loadTrafficSnapshot().then(() => {
 
 console.log("[Init] Dashboard ready - map should be visible");
 
+/* =========================
+   GOOGLE MAPS STYLE DUAL SEARCH
+========================= */
+let originSearchTimeout = null;
+let destSearchTimeout = null;
+let searchOriginResult = null;
+let searchDestResult = null;
+
+const originSearchInput = document.getElementById("originSearchInput");
+const destSearchInput = document.getElementById("destSearchInput");
+const originSearchResults = document.getElementById("originSearchResults");
+const destSearchResults = document.getElementById("destSearchResults");
+const findRoutesBtn = document.getElementById("findRoutesBtn");
+const swapLocationsBtn = document.getElementById("swapLocationsBtn");
+const routeSearchStatus = document.getElementById("routeSearchStatus");
+
+// Nominatim API search (reusable)
+async function performNominatimSearch(query, resultsContainer, onSelect) {
+  try {
+    const viewbox = "76.85,28.30,77.15,28.55"; // Gurugram bounds
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&viewbox=${viewbox}&bounded=0&limit=6&countrycodes=in`;
+
+    const response = await fetch(url, {
+      headers: { "User-Agent": "Gurugram-Traffic-Dashboard/1.0" }
+    });
+
+    if (!response.ok) throw new Error("Search failed");
+    const results = await response.json();
+
+    if (!results || results.length === 0) {
+      resultsContainer.innerHTML = '<div class="search-no-results">No results found</div>';
+      return;
+    }
+
+    resultsContainer.innerHTML = results.map((r, i) => {
+      const name = r.display_name.split(",")[0];
+      const address = r.display_name.split(",").slice(1, 3).join(",");
+      return `
+        <div class="search-result-item" data-lat="${r.lat}" data-lon="${r.lon}" data-name="${name}">
+          <div class="search-result-name">${name}</div>
+          <div class="search-result-address">${address}</div>
+        </div>
+      `;
+    }).join("");
+
+    resultsContainer.querySelectorAll(".search-result-item").forEach(item => {
+      item.addEventListener("click", () => onSelect(item, resultsContainer));
+    });
+  } catch (err) {
+    console.error("[Search] Error:", err);
+    resultsContainer.innerHTML = '<div class="search-no-results">Search failed</div>';
+  }
+}
+
+// Debounced search for origin
+function debounceOriginSearch(query) {
+  if (originSearchTimeout) clearTimeout(originSearchTimeout);
+  if (!query || query.length < 3) {
+    originSearchResults.style.display = "none";
+    return;
+  }
+  originSearchResults.innerHTML = '<div class="search-loading">🔍 Searching...</div>';
+  originSearchResults.style.display = "block";
+  originSearchTimeout = setTimeout(() => {
+    performNominatimSearch(query, originSearchResults, selectOriginResult);
+  }, 400);
+}
+
+// Debounced search for destination
+function debounceDestSearch(query) {
+  if (destSearchTimeout) clearTimeout(destSearchTimeout);
+  if (!query || query.length < 3) {
+    destSearchResults.style.display = "none";
+    return;
+  }
+  destSearchResults.innerHTML = '<div class="search-loading">🔍 Searching...</div>';
+  destSearchResults.style.display = "block";
+  destSearchTimeout = setTimeout(() => {
+    performNominatimSearch(query, destSearchResults, selectDestResult);
+  }, 400);
+}
+
+// Select origin result
+function selectOriginResult(item, container) {
+  const lat = parseFloat(item.dataset.lat);
+  const lon = parseFloat(item.dataset.lon);
+  const name = item.dataset.name;
+
+  searchOriginResult = { lat, lon, name };
+  originSearchInput.value = name;
+  originSearchInput.classList.add("has-value");
+  container.style.display = "none";
+
+  // Update origin marker - use routeOrigin for routing!
+  routeOrigin = { lat, lng: lon };
+  if (originMarker) map.removeLayer(originMarker);
+  originMarker = L.marker([lat, lon], {
+    icon: L.divIcon({
+      className: "custom-marker",
+      html: '<div class="marker-pin marker-origin-pin"><span>A</span></div>',
+      iconSize: [30, 40],
+      iconAnchor: [15, 40]
+    }),
+    pane: "markerPane"
+  }).addTo(map);
+
+  document.getElementById("originLabel").textContent = name;
+  updateRouteStatus();
+  console.log(`[Search] Origin: ${name}`);
+}
+
+// Select destination result
+function selectDestResult(item, container) {
+  const lat = parseFloat(item.dataset.lat);
+  const lon = parseFloat(item.dataset.lon);
+  const name = item.dataset.name;
+
+  searchDestResult = { lat, lon, name };
+  destSearchInput.value = name;
+  destSearchInput.classList.add("has-value");
+  container.style.display = "none";
+
+  // Update destination marker - use routeDestination for routing!
+  routeDestination = { lat, lng: lon };
+  if (destMarker) map.removeLayer(destMarker);
+  destMarker = L.marker([lat, lon], {
+    icon: L.divIcon({
+      className: "custom-marker",
+      html: '<div class="marker-pin marker-dest-pin"><span>B</span></div>',
+      iconSize: [30, 40],
+      iconAnchor: [15, 40]
+    }),
+    pane: "markerPane"
+  }).addTo(map);
+
+  document.getElementById("destLabel").textContent = name;
+  updateRouteStatus();
+  console.log(`[Search] Destination: ${name}`);
+}
+
+// Update status message
+function updateRouteStatus() {
+  if (routeSearchStatus) {
+    if (searchOriginResult && searchDestResult) {
+      routeSearchStatus.textContent = "✅ Ready to find routes!";
+      routeSearchStatus.style.color = "#16a34a";
+    } else if (searchOriginResult) {
+      routeSearchStatus.textContent = "Enter destination...";
+      routeSearchStatus.style.color = "#64748b";
+    } else if (searchDestResult) {
+      routeSearchStatus.textContent = "Enter origin...";
+      routeSearchStatus.style.color = "#64748b";
+    } else {
+      routeSearchStatus.textContent = "";
+    }
+  }
+}
+
+// Swap origin and destination
+if (swapLocationsBtn) {
+  swapLocationsBtn.addEventListener("click", () => {
+    // Swap data
+    const tempResult = searchOriginResult;
+    searchOriginResult = searchDestResult;
+    searchDestResult = tempResult;
+
+    const tempLatLng = routeOrigin;
+    routeOrigin = routeDestination;
+    routeDestination = tempLatLng;
+
+    // Swap input values
+    const tempValue = originSearchInput.value;
+    originSearchInput.value = destSearchInput.value;
+    destSearchInput.value = tempValue;
+
+    // Update markers
+    if (routeOrigin && routeDestination) {
+      if (originMarker) map.removeLayer(originMarker);
+      if (destMarker) map.removeLayer(destMarker);
+
+      originMarker = L.marker([routeOrigin.lat, routeOrigin.lng], {
+        icon: L.divIcon({
+          className: "custom-marker",
+          html: '<div class="marker-pin marker-origin-pin"><span>A</span></div>',
+          iconSize: [30, 40], iconAnchor: [15, 40]
+        }), pane: "markerPane"
+      }).addTo(map);
+
+      destMarker = L.marker([routeDestination.lat, routeDestination.lng], {
+        icon: L.divIcon({
+          className: "custom-marker",
+          html: '<div class="marker-pin marker-dest-pin"><span>B</span></div>',
+          iconSize: [30, 40], iconAnchor: [15, 40]
+        }), pane: "markerPane"
+      }).addTo(map);
+    }
+
+    console.log("[Search] Swapped origin and destination");
+  });
+}
+
+// Find Routes button
+if (findRoutesBtn) {
+  findRoutesBtn.addEventListener("click", () => {
+    // Check if user typed but didn't select from dropdown
+    const originText = originSearchInput?.value.trim();
+    const destText = destSearchInput?.value.trim();
+
+    if (!routeOrigin && originText) {
+      routeSearchStatus.textContent = "⚠️ Select origin from dropdown";
+      routeSearchStatus.style.color = "#dc2626";
+      return;
+    }
+    if (!routeDestination && destText) {
+      routeSearchStatus.textContent = "⚠️ Select destination from dropdown";
+      routeSearchStatus.style.color = "#dc2626";
+      return;
+    }
+    if (!routeOrigin || !routeDestination) {
+      routeSearchStatus.textContent = "⚠️ Please enter both origin and destination";
+      routeSearchStatus.style.color = "#dc2626";
+      return;
+    }
+
+    // Zoom to fit both points
+    const bounds = L.latLngBounds([
+      [routeOrigin.lat, routeOrigin.lng],
+      [routeDestination.lat, routeDestination.lng]
+    ]);
+    map.fitBounds(bounds, { padding: [50, 50] });
+
+    // Calculate routes
+    calculateAllRoutes();
+    routeSearchStatus.textContent = "🔄 Calculating routes...";
+    routeSearchStatus.style.color = "#3b82f6";
+  });
+}
+
+// Event listeners for inputs
+if (originSearchInput) {
+  originSearchInput.addEventListener("input", (e) => debounceOriginSearch(e.target.value.trim()));
+  originSearchInput.addEventListener("focus", () => {
+    if (originSearchInput.value.length >= 3) originSearchResults.style.display = "block";
+  });
+}
+
+if (destSearchInput) {
+  destSearchInput.addEventListener("input", (e) => debounceDestSearch(e.target.value.trim()));
+  destSearchInput.addEventListener("focus", () => {
+    if (destSearchInput.value.length >= 3) destSearchResults.style.display = "block";
+  });
+}
+
+// Hide dropdowns when clicking outside
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#originSearchInput") && !e.target.closest("#originSearchResults")) {
+    originSearchResults.style.display = "none";
+  }
+  if (!e.target.closest("#destSearchInput") && !e.target.closest("#destSearchResults")) {
+    destSearchResults.style.display = "none";
+  }
+});
+
+console.log("[Init] Dual search initialized");

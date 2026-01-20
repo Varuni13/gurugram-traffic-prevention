@@ -21,41 +21,11 @@ import config as global_config
 # ============================================================================
 _FLOOD_ROADS_CACHE: Dict[str, Dict[str, Any]] = {}  # key -> geojson dict
 
-<<<<<<< HEAD
 # ============================================================================
 # SETUP FLASK APP
 # ============================================================================
 PROJECT_ROOT = global_config.PROJECT_ROOT
 WEB_DIR = global_config.WEB_DIR
-=======
-# Optional (needed for flood->roads intersection)
-try:
-    import geopandas as gpd
-    from shapely.geometry import shape
-    GEOPANDAS_OK = True
-except Exception:
-    gpd = None
-    shape = None
-    GEOPANDAS_OK = False
-
-try:
-    from dotenv import load_dotenv
-    env_path = Path(__file__).resolve().parents[1] / ".env"
-    load_dotenv(env_path)
-    print(f"[Config] Loaded .env from: {env_path}")
-except Exception:
-    print("[Config] dotenv not loaded (ok). Using system env only.")
-
-# Routing import (your existing backend routing module)
-try:
-    from server.routing import find_route, get_graph_info, precompute_all_flood_data, get_cache_stats, dump_route_cache_to_disk
-except Exception:
-    from routing import find_route, get_graph_info, precompute_all_flood_data, get_cache_stats, dump_route_cache_to_disk
-
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-WEB_DIR = PROJECT_ROOT / "web"
->>>>>>> d4dba2cc6b1ee9737ed86a79e0f9d378b35fcc7c
 
 app = Flask(__name__, static_folder=str(WEB_DIR), static_url_path="")
 
@@ -82,6 +52,12 @@ try:
     from server.routing import find_route, get_graph_info, precompute_all_flood_data, get_cache_stats
 except ImportError:
     from routing import find_route, get_graph_info, precompute_all_flood_data, get_cache_stats
+
+# Import cache functions for API exposure
+try:
+    from server.routing import save_route_cache_to_disk, invalidate_caches
+except ImportError:
+    from routing import save_route_cache_to_disk, invalidate_caches
 
 # ============================================================================
 # USE GLOBAL CONFIGURATION
@@ -169,7 +145,11 @@ def api_flood_roads():
     try:
         time_param = request.args.get("time")
         result = get_flooded_roads(time_param)
-        return jsonify(result)
+        
+        # Add cache headers for 1 hour - flood data for a specific time doesn't change
+        response = make_response(jsonify(result))
+        response.headers["Cache-Control"] = "public, max-age=3600"
+        return response
     except FileNotFoundError as e:
         return jsonify({"error": str(e)}), 404
     except Exception as e:
@@ -331,11 +311,6 @@ def api_cache_stats():
     return jsonify(get_cache_stats())
 
 
-<<<<<<< HEAD
-# ----------------------------
-# STATIC FILE SERVING
-# ----------------------------
-=======
 @app.route("/api/debug/dump-cache")
 def api_debug_dump_cache():
     """
@@ -358,8 +333,9 @@ def api_debug_dump_cache():
         return jsonify({"error": f"Failed to dump cache: {str(e)}"}), 500
 
 
-
->>>>>>> d4dba2cc6b1ee9737ed86a79e0f9d378b35fcc7c
+# ----------------------------
+# STATIC FILE SERVING
+# ----------------------------
 @app.route("/")
 def index():
     """Serve the main HTML page."""
@@ -396,7 +372,6 @@ if __name__ == "__main__":
     print("\n" + "="*70)
     print("[Flask Server] Starting on development server...")
     print("="*70)
-<<<<<<< HEAD
     print(f"Host: {global_config.FLASK_HOST}:{global_config.FLASK_PORT}")
     print("Note: First route calculations may be slower while cache builds")
     print("Press Ctrl+C to stop\n")
@@ -406,10 +381,4 @@ if __name__ == "__main__":
         port=global_config.FLASK_PORT,
         debug=global_config.FLASK_DEBUG
     )
-=======
-    print("Note: First route calculations may be slower while cache builds")
-    print("Press Ctrl+C to stop\n")
-    
-    app.run(host="0.0.0.0", port=9110, debug=False)
->>>>>>> d4dba2cc6b1ee9737ed86a79e0f9d378b35fcc7c
 
