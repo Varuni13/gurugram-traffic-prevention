@@ -87,7 +87,7 @@ def main():
 
     # timestamps
     ts_utc = datetime.now(timezone.utc).isoformat()
-    ts_local = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ts_local = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " IST"
 
     results = []
     total = len(MONITOR_POINTS)

@@ -160,14 +160,17 @@ def run_scheduler():
     # Write our PID
     write_pid()
     
-    # Handle graceful shutdown
+    # Handle graceful shutdown (only works in main thread)
     def signal_handler(signum, frame):
         log("🛑 Received shutdown signal, cleaning up...")
         cleanup_pid()
         sys.exit(0)
     
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
+    # Only register signal handlers if running in main thread
+    import threading
+    if threading.current_thread() is threading.main_thread():
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
     
     log("=" * 60)
     log("🚀 Smart Traffic Scheduler Started")

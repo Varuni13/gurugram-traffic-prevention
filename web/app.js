@@ -63,6 +63,10 @@ initDarkMode();
 let lastAlertTime = 0;
 const ALERT_COOLDOWN = 60000; // 1 minute cooldown between alerts
 
+// Track previous traffic state to detect changes
+let previousTrafficState = { heavy: null, moderate: null, smooth: null };
+let isInitialLoad = true; // Skip alerts on first page load
+
 function showToast(message, type = 'error', title = 'Alert') {
   const container = document.getElementById('toastContainer');
   if (!container) return;
@@ -95,27 +99,59 @@ function showToast(message, type = 'error', title = 'Alert') {
   }, 5000);
 }
 
-function checkTrafficAlerts(heavy, moderate) {
+function checkTrafficAlerts(heavy, moderate, smooth) {
   const now = Date.now();
+  
+  // Skip alerts on initial page load - just store the state
+  if (isInitialLoad) {
+    previousTrafficState = { heavy, moderate, smooth };
+    isInitialLoad = false;
+    console.log('[Alerts] Initial load - storing baseline state:', previousTrafficState);
+    return;
+  }
   
   // Cooldown to prevent spam
   if (now - lastAlertTime < ALERT_COOLDOWN) return;
   
-  if (heavy >= 3) {
+  const prevHeavy = previousTrafficState.heavy ?? 0;
+  const prevModerate = previousTrafficState.moderate ?? 0;
+  
+  // Check if traffic got WORSE
+  const heavyIncreased = heavy > prevHeavy && heavy >= 3;
+  const moderateIncreased = moderate > prevModerate && moderate >= 10;
+  
+  // Check if traffic IMPROVED significantly
+  const heavyDecreased = heavy < prevHeavy && prevHeavy >= 3 && heavy <= 1;
+  const moderateDecreased = moderate < prevModerate - 5 && prevModerate >= 10;
+  
+  if (heavyIncreased) {
+    const diff = heavy - prevHeavy;
     showToast(
-      `${heavy} locations with heavy traffic detected!`,
+      `Traffic worsened! ${diff} more heavy congestion point${diff > 1 ? 's' : ''} (now ${heavy} total)`,
       'error',
-      'Heavy Traffic Alert'
+      '🚨 Traffic Alert'
     );
     lastAlertTime = now;
-  } else if (moderate >= 12) {
+  } else if (moderateIncreased && !heavyIncreased) {
+    const diff = moderate - prevModerate;
     showToast(
-      `${moderate} locations with moderate congestion`,
+      `${diff} more locations showing moderate traffic (now ${moderate} total)`,
       'warning', 
-      'Traffic Advisory'
+      '⚠️ Traffic Advisory'
+    );
+    lastAlertTime = now;
+  } else if (heavyDecreased) {
+    showToast(
+      `Traffic clearing up! Heavy congestion reduced to ${heavy} point${heavy !== 1 ? 's' : ''}`,
+      'success',
+      '✅ Traffic Improving'
     );
     lastAlertTime = now;
   }
+  
+  // Update previous state for next comparison
+  previousTrafficState = { heavy, moderate, smooth };
+  console.log('[Alerts] Updated traffic state:', previousTrafficState);
 }
 
 /* =========================
@@ -244,10 +280,71 @@ function updateTrafficStatusCounts(points) {
   // ★ Update traffic trend chart
   updateTrafficTrendChart(smooth, moderate, heavy);
   
-  // ★ Check for alerts
-  checkTrafficAlerts(heavy, moderate);
+  // ★ Check for alerts (pass all three counts)
+  checkTrafficAlerts(heavy, moderate, smooth);
   
   console.log(`[Traffic Status] Smooth: ${smooth}, Moderate: ${moderate}, Heavy: ${heavy}`);
+}
+
+/* =========================
+   ZOOM TO TRAFFIC POINTS BY CATEGORY
+========================= */
+function zoomToTrafficPoints(category) {
+  const markers = trafficPointMarkers[category];
+  
+  if (!markers || markers.length === 0) {
+    console.log(`[Zoom] No ${category} traffic points to zoom to`);
+    return;
+  }
+  
+  // Create bounds from all markers of this category
+  const bounds = L.latLngBounds();
+  markers.forEach(marker => {
+    bounds.extend(marker.getLatLng());
+  });
+  
+  // Fit map to bounds with padding
+  map.fitBounds(bounds, { 
+    padding: [50, 50],
+    maxZoom: 16
+  });
+  
+  // Flash the markers to highlight them
+  markers.forEach(marker => {
+    const originalRadius = marker.options.radius;
+    const originalWeight = marker.options.weight;
+    
+    // Pulse effect
+    marker.setStyle({ radius: originalRadius * 1.8, weight: 4 });
+    setTimeout(() => {
+      marker.setStyle({ radius: originalRadius * 1.5, weight: 3 });
+    }, 150);
+    setTimeout(() => {
+      marker.setStyle({ radius: originalRadius, weight: originalWeight });
+    }, 300);
+  });
+  
+  console.log(`[Zoom] Zoomed to ${markers.length} ${category} traffic points`);
+}
+
+// Initialize status card click handlers
+function initStatusCardClickHandlers() {
+  const cards = {
+    'status-smooth': 'smooth',
+    'status-moderate': 'moderate', 
+    'status-heavy': 'heavy'
+  };
+  
+  Object.entries(cards).forEach(([className, category]) => {
+    const card = document.querySelector(`.${className}`);
+    if (card) {
+      card.style.cursor = 'pointer';
+      card.title = `Click to zoom to ${category} traffic points`;
+      card.addEventListener('click', () => zoomToTrafficPoints(category));
+    }
+  });
+  
+  console.log('[Init] Status card click handlers initialized');
 }
 
 /* =========================
@@ -275,6 +372,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initialize chart after short delay
   setTimeout(initTrafficTrendChart, 1000);
+  
+  // Initialize status card click handlers
+  initStatusCardClickHandlers();
 });
 
 // 25 Traffic Hotspots for Gurugram
@@ -332,7 +432,7 @@ function getFloodMode() {
 /* =========================
    MAP + PANES
 ========================= */
-const map = L.map("map", { zoomControl: true }).setView([28.4595, 77.0266], 13);
+const map = L.map("map", { zoomControl: true, maxZoom: 18 }).setView([28.4595, 77.0266], 13);
 
 map.createPane("basePane");
 map.getPane("basePane").style.zIndex = 200;
@@ -404,16 +504,53 @@ const googleTerrain = L.tileLayer(
 // Add default and layer control
 googleStreets.addTo(map);  // Default to Google Streets
 
-L.control.layers({
-  "OSM Standard": osmStandard,
-  "Light (Carto)": baseLight,
-  "Dark (Carto)": baseDark,
-  "Satellite (ESRI)": satellite,
-  "Google Streets": googleStreets,
-  "Google Satellite": googleSatellite,
-  "Google Hybrid": googleHybrid,
-  "Google Terrain": googleTerrain
-}, null, { position: "topright", collapsed: true }).addTo(map);
+// Store all base layers for selector
+const baseLayers = {
+  googleStreets,
+  googleSatellite,
+  googleHybrid,
+  googleTerrain,
+  osmStandard,
+  baseLight,
+  baseDark,
+  satellite
+};
+
+let currentBaseLayer = googleStreets;
+
+// Base map selector handler
+function initBaseMapSelector() {
+  const selector = document.getElementById('baseMapSelector');
+  if (!selector) return;
+  
+  selector.addEventListener('change', (e) => {
+    const layerName = e.target.value;
+    const newLayer = baseLayers[layerName];
+    
+    if (newLayer && newLayer !== currentBaseLayer) {
+      map.removeLayer(currentBaseLayer);
+      newLayer.addTo(map);
+      currentBaseLayer = newLayer;
+      
+      // Save preference
+      localStorage.setItem('preferredBaseMap', layerName);
+    }
+  });
+  
+  // Restore saved preference
+  const saved = localStorage.getItem('preferredBaseMap');
+  if (saved && baseLayers[saved]) {
+    selector.value = saved;
+    if (baseLayers[saved] !== currentBaseLayer) {
+      map.removeLayer(currentBaseLayer);
+      baseLayers[saved].addTo(map);
+      currentBaseLayer = baseLayers[saved];
+    }
+  }
+}
+
+// Hide the default Leaflet layer control (we use our own dropdown now)
+// L.control.layers not added
 
 /* =========================
    LIVE TRAFFIC TILES
@@ -704,11 +841,16 @@ async function updateTrafficSyncInfo(floodIndex) {
    TRAFFIC SNAPSHOT POINTS
 ========================= */
 let trafficSnapshot = null;
-let trafficPointMarkers = [];
+let trafficPointMarkers = {
+  smooth: [],
+  moderate: [],
+  heavy: [],
+  all: [] // Keep a flat list for backward compatibility
+};
 
 function clearTrafficPointMarkers() {
-  trafficPointMarkers.forEach((m) => map.removeLayer(m));
-  trafficPointMarkers = [];
+  trafficPointMarkers.all.forEach((m) => map.removeLayer(m));
+  trafficPointMarkers = { smooth: [], moderate: [], heavy: [], all: [] };
 }
 
 async function loadTrafficSnapshot(timeIdx = null) {
@@ -773,10 +915,14 @@ async function loadTrafficSnapshot(timeIdx = null) {
       );
 
       marker.addTo(map);
-      trafficPointMarkers.push(marker);
+      
+      // Categorize marker by speed ratio
+      const category = sr >= 0.85 ? 'smooth' : sr >= 0.65 ? 'moderate' : 'heavy';
+      trafficPointMarkers[category].push(marker);
+      trafficPointMarkers.all.push(marker);
     });
 
-    console.log("✓ Traffic snapshot markers loaded:", trafficPointMarkers.length, timeIdx !== null ? `(synced to index ${timeIdx})` : "");
+    console.log("✓ Traffic snapshot markers loaded:", trafficPointMarkers.all.length, timeIdx !== null ? `(synced to index ${timeIdx})` : "");
   } catch (err) {
     console.error("=== TRAFFIC SNAPSHOT ERROR ===");
     console.error("Error name:", err.name);
@@ -1132,13 +1278,14 @@ async function updateRouteComparison(origin, dest) {
   if (!table || !tbody) return;
 
   table.style.display = "block";
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#94a3b8;">Calculating...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8;">Calculating...</td></tr>';
 
+  // Route colors matching the map lines
   const types = [
-    { id: "shortest", label: "Shortest" },
-    { id: "fastest", label: "Fastest" },
-    { id: "flood_avoid", label: "Flood-Avoid" },
-    { id: "smart", label: "Smart" }
+    { id: "shortest", label: "Shortest", color: "#673AB7" },
+    { id: "fastest", label: "Fastest", color: "#E91E63" },
+    { id: "flood_avoid", label: "Flood-Avoid", color: "#1B5E20" },
+    { id: "smart", label: "Smart", color: "#000000" }
   ];
 
   try {
@@ -1160,52 +1307,49 @@ async function updateRouteComparison(origin, dest) {
 
     tbody.innerHTML = ""; // Clear loader
 
+    // Find the best (fastest) ETA among successful results
+    let bestEta = Infinity;
+    results.forEach(res => {
+      if (res.success && res.data.properties) {
+        const eta = res.data.properties.eta_s;
+        if (eta < bestEta) bestEta = eta;
+      }
+    });
+
     results.forEach(res => {
       const type = res.type;
-
       const tr = document.createElement("tr");
-      tr.style.borderBottom = "1px solid #f1f5f9";
 
       if (!res.success) {
         tr.innerHTML = `
-            <td style="padding: 6px; font-weight: 500;">${type.label}</td>
-            <td colspan="3" style="padding: 6px; color: #ef4444;">Failed</td>
+            <td><span class="route-color-dot" style="background:${type.color}"></span>${type.label}</td>
+            <td colspan="2" class="route-failed">Unavailable</td>
          `;
         tbody.appendChild(tr);
         return;
       }
 
       const props = res.data.properties;
+      const etaMin = Math.round(props.eta_s / 60);
+      const distKm = (props.distance_m / 1000).toFixed(1);
+      const isBest = props.eta_s === bestEta;
 
-      // Status icon
-      let statusIcon = "✅";
-      let statusText = "OK";
-      let etaMin = Math.round(props.eta_s / 60);
-
-      if (props.has_flood) {
-        statusIcon = "⚠️";
-        statusText = "Flooded";
-      } else if (type.id === "fastest" && props.eta_s > props.distance_m / 10) {
-        statusIcon = "🚗";
-        statusText = "Traffic";
-      } else if (type.id === "smart") {
-        statusIcon = "⭐";
-        statusText = "Best";
+      // Highlight best route row
+      if (isBest) {
+        tr.classList.add("best-route");
       }
 
-      // Format row
       tr.innerHTML = `
-        <td style="padding: 6px; font-weight: 500;">${type.label}</td>
-        <td style="padding: 6px;">${(props.distance_m / 1000).toFixed(1)} km</td>
-        <td style="padding: 6px;">${etaMin} min</td>
-        <td style="padding: 6px; font-size: 11px;">${statusIcon} ${statusText}</td>
+        <td><span class="route-color-dot" style="background:${type.color}"></span>${type.label}</td>
+        <td>${distKm} km</td>
+        <td class="eta-cell">${etaMin} min${isBest ? '<span class="best-badge">Fastest</span>' : ''}</td>
       `;
       tbody.appendChild(tr);
     });
 
   } catch (err) {
     console.error("Comparison fatal error:", err);
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#ef4444;">Error updating table</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#ef4444;">Error loading routes</td></tr>';
   }
 }
 
@@ -1472,6 +1616,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Init
+  initBaseMapSelector();  // Initialize base map dropdown
   loadFloodTimeline();
   loadTrafficSnapshot();
   restoreLayerVisibility();
@@ -1588,11 +1733,15 @@ const findRoutesBtn = document.getElementById("findRoutesBtn");
 const swapLocationsBtn = document.getElementById("swapLocationsBtn");
 const routeSearchStatus = document.getElementById("routeSearchStatus");
 
-// Nominatim API search (reusable)
+// Nominatim API search (reusable) - RESTRICTED TO GURUGRAM
 async function performNominatimSearch(query, resultsContainer, onSelect) {
   try {
-    const viewbox = "76.85,28.30,77.15,28.55"; // Gurugram bounds
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&viewbox=${viewbox}&bounded=0&limit=6&countrycodes=in`;
+    // Expanded Gurugram bounds (covers entire Gurugram district)
+    // Format: left,bottom,right,top (min_lon, min_lat, max_lon, max_lat)
+    const viewbox = "76.82,28.35,77.18,28.58";
+    
+    // bounded=1 strictly limits results to within the viewbox
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ", Gurugram")}&viewbox=${viewbox}&bounded=1&limit=6&countrycodes=in`;
 
     const response = await fetch(url, {
       headers: { "User-Agent": "Gurugram-Traffic-Dashboard/1.0" }
@@ -1602,7 +1751,7 @@ async function performNominatimSearch(query, resultsContainer, onSelect) {
     const results = await response.json();
 
     if (!results || results.length === 0) {
-      resultsContainer.innerHTML = '<div class="search-no-results">No results found</div>';
+      resultsContainer.innerHTML = '<div class="search-no-results">📍 No locations found in Gurugram area</div>';
       return;
     }
 

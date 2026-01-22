@@ -20,11 +20,7 @@
     <header class="app-header">
         <div class="header-brand">
             <div class="brand-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L4 7v10l8 5 8-5V7l-8-5z" stroke="currentColor" stroke-width="2" fill="none"/>
-                    <circle cx="12" cy="12" r="3" fill="currentColor"/>
-                    <path d="M12 2v4M12 18v4M4 7l4 2M16 9l4-2M4 17l4-2M16 15l4 2" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
+                <img src="./logo.png" alt="Gurugram Mobility Logo" class="header-logo" />
             </div>
             <div class="brand-text">
                 <h1>Gurugram Mobility</h1>
@@ -32,6 +28,11 @@
             </div>
         </div>
         <div class="header-status">
+            <!-- Traffic Flow Gradient in Header -->
+            <div class="header-traffic-legend">
+                <div class="header-gradient-bar"></div>
+                <span class="header-gradient-label">Traffic</span>
+            </div>
             <!-- Dark Mode Toggle -->
             <button id="darkModeToggle" class="dark-mode-btn" title="Toggle Dark Mode">
                 <span class="mode-icon">🌙</span>
@@ -69,9 +70,6 @@
         </div>
     </div>
 
-    <!-- Panel toggle button -->
-    <button id="panel-toggle" class="panel-open" title="Toggle Panel">☰</button>
-
     <div id="control-panel">
         <div class="panel-header">
             <div class="panel-title">
@@ -83,119 +81,39 @@
             </div>
         </div>
 
-        <!-- ALWAYS VISIBLE LEGEND -->
-        <div class="legend-box">
-            <div class="legend-title">📊 Quick Legend</div>
-            <div class="legend-grid">
-                <span class="legend-dot" style="background:#673AB7"></span><span>Shortest</span>
-                <span class="legend-dot" style="background:#E91E63"></span><span>Fastest</span>
-                <span class="legend-dot" style="background:#1B5E20"></span><span>Flood-safe</span>
-                <span class="legend-dot" style="background:#000000"></span><span>Smart</span>
-                <span class="legend-dot" style="background:#38BDF8"></span><span>Flooded roads</span>
-                <span class="legend-dot-traffic"></span><span>Traffic (🟢→🔴)</span>
-            </div>
-        </div>
-
-        <!-- Google Maps Style Route Search -->
-        <div class="section-title">🛣️ Plan Your Route</div>
-
-        <!-- Origin Search -->
-        <div class="route-search-row">
-            <span class="route-search-icon origin-icon">A</span>
-            <div class="search-container" style="flex: 1; position: relative;">
-                <input type="text" id="originSearchInput" class="route-search-input" placeholder="Enter origin..."
-                    autocomplete="off" />
-                <div id="originSearchResults" class="search-results" style="display: none;"></div>
-            </div>
-        </div>
-
-        <!-- Destination Search -->
-        <div class="route-search-row">
-            <span class="route-search-icon dest-icon">B</span>
-            <div class="search-container" style="flex: 1; position: relative;">
-                <input type="text" id="destSearchInput" class="route-search-input" placeholder="Enter destination..."
-                    autocomplete="off" />
-                <div id="destSearchResults" class="search-results" style="display: none;"></div>
-            </div>
-        </div>
-
-        <!-- Swap and Find Routes -->
-        <div style="display: flex; gap: 6px; margin-top: 10px;">
-            <button id="swapLocationsBtn" class="btn" style="padding: 8px 12px;"
-                title="Swap origin and destination">⇅</button>
-            <button id="findRoutesBtn" class="btn btn-primary" style="flex: 1; margin-top: 0;">🛣️ Find Routes</button>
-        </div>
-
-        <!-- Route Status -->
-        <div id="routeSearchStatus" class="route-status" style="margin-top: 8px;"></div>
-
-        <hr />
-
-
-        <!-- ACCORDION SECTION 1: Route Options -->
+        <!-- SECTION 1: Time Travel (Compact design) -->
         <div class="accordion-section">
-            <div class="accordion-header" onclick="toggleAccordion('routeOptionsSection')">
-                <span class="accordion-icon">🛣️</span>
-                <span class="accordion-title">Route Options</span>
-                <span class="accordion-chevron" id="routeOptionsSection-chevron">▼</span>
+            <div class="accordion-header" onclick="toggleAccordion('timeSection')">
+                <span class="accordion-icon">⏱️</span>
+                <span class="accordion-title">Time Travel</span>
+                <span class="accordion-chevron" id="timeSection-chevron">▼</span>
             </div>
-            <div class="accordion-content" id="routeOptionsSection">
-                <div class="route-checkboxes">
-                    <label class="row route-option">
-                        <input type="checkbox" id="routeShortest" checked />
-                        <span class="route-swatch" style="background:#673AB7"></span>
-                        <span>Shortest (distance)</span>
-                    </label>
-                    <label class="row route-option">
-                        <input type="checkbox" id="routeTraffic" checked />
-                        <span class="route-swatch" style="background:#E91E63"></span>
-                        <span>Fastest (time)</span>
-                    </label>
-                    <label class="row route-option">
-                        <input type="checkbox" id="routeFlood" checked />
-                        <span class="route-swatch" style="background:#1B5E20"></span>
-                        <span>Flood-avoiding</span>
-                    </label>
-                    <label class="row route-option">
-                        <input type="checkbox" id="routeSmart" checked />
-                        <span class="route-swatch" style="background:#000000"></span>
-                        <span>Smart (avoid both)</span>
-                    </label>
+            <div class="accordion-content" id="timeSection">
+                <!-- Compact Time Control -->
+                <div class="time-compact-row">
+                    <button id="timePrevBtn" class="time-step-btn-sm" title="Previous">◀</button>
+                    <div class="time-display-compact">
+                        <span id="sliderCurrentTime" class="time-value-compact">--:--</span>
+                    </div>
+                    <button id="timeNextBtn" class="time-step-btn-sm" title="Next">▶</button>
                 </div>
-                <div class="hint" style="margin-top: 8px;">Check routes to compare. Routes calculate when origin +
-                    destination set.</div>
-
-                <!-- Route Comparison Table (inside options) -->
-                <div id="routeComparisonPanel"
-                    style="display: none; margin-top: 16px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
-                    <div style="font-weight: 600; margin-bottom: 6px; font-size: 12px;">📊 Route Comparison</div>
-                    <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid #e2e8f0; text-align: left; color: #64748b;">
-                                <th style="padding: 4px;">Type</th>
-                                <th style="padding: 4px;">Dist</th>
-                                <th style="padding: 4px;">ETA</th>
-                                <th style="padding: 4px;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="routeComparisonBody">
-                            <!-- Rows will be injected by JS -->
-                        </tbody>
-                    </table>
+                <div class="slider-full-row">
+                    <span id="sliderStartTime" class="time-label-sm">--:--</span>
+                    <input id="floodTimeSlider" type="range" min="0" max="0" step="1" value="0" class="time-slider-compact" />
+                    <span id="sliderEndTime" class="time-label-sm">--:--</span>
                 </div>
             </div>
         </div>
 
-        <!-- ACCORDION SECTION 2: Route Planning (Quick Routes) -->
+        <!-- SECTION 2: Popular Routes (Quick Presets) - OPEN BY DEFAULT -->
         <div class="accordion-section">
             <div class="accordion-header" onclick="toggleAccordion('routePlanningSection')">
-                <span class="accordion-icon">📌</span>
-                <span class="accordion-title">Quick Routes (Presets)</span>
-                <span class="accordion-chevron" id="routePlanningSection-chevron">▶</span>
+                <span class="accordion-icon">⚡</span>
+                <span class="accordion-title">Popular Routes</span>
+                <span class="accordion-chevron" id="routePlanningSection-chevron">▼</span>
             </div>
-            <div class="accordion-content collapsed" id="routePlanningSection">
-                <!-- Quick Routes -->
-                <div style="font-weight: 600; margin-bottom: 6px; font-size: 12px;">25 Traffic Hotspots</div>
+            <div class="accordion-content" id="routePlanningSection">
+                <div class="hint" style="margin-bottom: 10px;">Select from 25 major traffic hotspots</div>
                 <div class="quick-route-controls">
                     <div class="quick-route-row">
                         <label>From:</label>
@@ -259,28 +177,148 @@
                             <option value="pataudi_rd">Pataudi Rd - Sector 89/90</option>
                         </select>
                     </div>
-                    <button id="calculateQuickRouteBtn" class="btn btn-primary">📍 Calculate Quick Route</button>
-                    <button id="clearQuickRoutesBtn" class="clear-btn" style="margin-top:6px;">🗑️ Clear</button>
+                    <div class="btn-row">
+                        <button id="calculateQuickRouteBtn" class="btn btn-primary">🚀 Go!</button>
+                        <button id="clearQuickRoutesBtn" class="btn btn-secondary">🗑️ Clear</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ACCORDION SECTION 3: Map Layers -->
+        <!-- Route Status (always visible) -->
+        <div id="routeSearchStatus" class="route-status"></div>
+
+        <!-- OR Divider -->
+        <div class="or-divider">
+            <span class="or-line"></span>
+            <span class="or-text">OR</span>
+            <span class="or-line"></span>
+        </div>
+
+        <!-- SECTION 3: Custom Route Search -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion('customRouteSection')">
+                <span class="accordion-icon">🔍</span>
+                <span class="accordion-title">Plan Custom Route</span>
+                <span class="accordion-chevron" id="customRouteSection-chevron">▶</span>
+            </div>
+            <div class="accordion-content collapsed" id="customRouteSection">
+                <div class="hint" style="margin-bottom: 10px;">Search any location in Gurugram</div>
+                
+                <!-- Origin Search -->
+                <div class="route-search-row">
+                    <span class="route-search-icon origin-icon">A</span>
+                    <div class="search-container" style="flex: 1; position: relative;">
+                        <input type="text" id="originSearchInput" class="route-search-input" placeholder="Enter origin..."
+                            autocomplete="off" />
+                        <div id="originSearchResults" class="search-results" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Destination Search -->
+                <div class="route-search-row">
+                    <span class="route-search-icon dest-icon">B</span>
+                    <div class="search-container" style="flex: 1; position: relative;">
+                        <input type="text" id="destSearchInput" class="route-search-input" placeholder="Enter destination..."
+                            autocomplete="off" />
+                        <div id="destSearchResults" class="search-results" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <!-- Swap and Find Routes -->
+                <div style="display: flex; gap: 6px; margin-top: 10px;">
+                    <button id="swapLocationsBtn" class="btn" style="padding: 8px 12px;"
+                        title="Swap origin and destination">⇅</button>
+                    <button id="findRoutesBtn" class="btn btn-primary" style="flex: 1; margin-top: 0;">🛣️ Find Routes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: Route Options -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion('routeOptionsSection')">
+                <span class="accordion-icon">🛤️</span>
+                <span class="accordion-title">Route Options</span>
+                <span class="accordion-chevron" id="routeOptionsSection-chevron">▶</span>
+            </div>
+            <div class="accordion-content collapsed" id="routeOptionsSection">
+                <div class="route-checkboxes">
+                    <label class="row route-option">
+                        <input type="checkbox" id="routeShortest" checked />
+                        <span class="route-swatch" style="background:#673AB7"></span>
+                        <span>Shortest (distance)</span>
+                    </label>
+                    <label class="row route-option">
+                        <input type="checkbox" id="routeTraffic" checked />
+                        <span class="route-swatch" style="background:#E91E63"></span>
+                        <span>Fastest (time)</span>
+                    </label>
+                    <label class="row route-option">
+                        <input type="checkbox" id="routeFlood" checked />
+                        <span class="route-swatch" style="background:#1B5E20"></span>
+                        <span>Flood-avoiding</span>
+                    </label>
+                    <label class="row route-option">
+                        <input type="checkbox" id="routeSmart" checked />
+                        <span class="route-swatch" style="background:#000000"></span>
+                        <span>Smart (avoid both)</span>
+                    </label>
+                </div>
+                <div class="hint" style="margin-top: 8px;">Check routes to compare on map</div>
+
+                <!-- Route Comparison Table -->
+                <div id="routeComparisonPanel"
+                    style="display: none; margin-top: 16px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                    <div style="font-weight: 600; margin-bottom: 8px; font-size: 13px;">Route Comparison</div>
+                    <table class="route-comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Route</th>
+                                <th>Distance</th>
+                                <th>ETA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="routeComparisonBody">
+                            <!-- Rows will be injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 5: Map Layers -->
         <div class="accordion-section">
             <div class="accordion-header" onclick="toggleAccordion('layersSection')">
-                <span class="accordion-icon">👁️</span>
+                <span class="accordion-icon">🗺️</span>
                 <span class="accordion-title">Map Layers</span>
                 <span class="accordion-chevron" id="layersSection-chevron">▶</span>
             </div>
             <div class="accordion-content collapsed" id="layersSection">
+                <!-- Base Map Selector -->
+                <div class="map-style-selector">
+                    <label class="selector-label">Base Map Style</label>
+                    <select id="baseMapSelector" class="map-select">
+                        <option value="googleStreets">Google Streets</option>
+                        <option value="googleSatellite">Google Satellite</option>
+                        <option value="googleHybrid">Google Hybrid</option>
+                        <option value="googleTerrain">Google Terrain</option>
+                        <option value="osmStandard">OpenStreetMap</option>
+                        <option value="baseLight">Light (Carto)</option>
+                        <option value="baseDark">Dark (Carto)</option>
+                        <option value="satellite">Satellite (ESRI)</option>
+                    </select>
+                </div>
+
+                <div class="layer-divider"></div>
+
                 <label class="row">
                     <input type="checkbox" id="toggleTrafficPoints" checked />
-                    <span>Traffic Status</span>
+                    <span>Traffic Status Points</span>
                 </label>
 
                 <label class="row">
                     <input type="checkbox" id="toggleTraffic" checked />
-                    <span>Live Traffic View</span>
+                    <span>Live Traffic Layer</span>
                 </label>
 
                 <label class="row">
@@ -290,57 +328,37 @@
 
                 <label class="row">
                     <input type="checkbox" id="toggleRoadNetwork" />
-                    <span>All Roads</span>
+                    <span>All Roads Network</span>
                 </label>
             </div>
         </div>
 
-        <!-- ACCORDION SECTION 4: Select Time -->
-        <div class="accordion-section">
-            <div class="accordion-header" onclick="toggleAccordion('timeSection')">
-                <span class="accordion-icon">⏰</span>
-                <span class="accordion-title">Select Time</span>
-                <span class="accordion-chevron" id="timeSection-chevron">▶</span>
-            </div>
-            <div class="accordion-content collapsed" id="timeSection">
-                <!-- Large Time Display -->
-                <div class="time-display-box">
-                    <span id="sliderCurrentTime" class="time-display-value">--:--</span>
-                    <span class="time-display-label">Current Time</span>
-                </div>
-
-                <!-- Step Buttons + Slider -->
-                <div class="time-control-row">
-                    <button id="timePrevBtn" class="time-step-btn" title="Previous (-5 min)">◀</button>
-                    <div class="slider-container">
-                        <input id="floodTimeSlider" type="range" min="0" max="0" step="1" value="0" />
-                    </div>
-                    <button id="timeNextBtn" class="time-step-btn" title="Next (+5 min)">▶</button>
-                </div>
-
-                <!-- Time Range Labels -->
-                <div class="time-range-labels">
-                    <span id="sliderStartTime">--:--</span>
-                    <span id="sliderEndTime">--:--</span>
-                </div>
-
-                <!-- Quick Jump Buttons -->
-                <div class="time-quick-buttons">
-                    <button class="time-quick-btn" data-jump="start">Start</button>
-                    <button class="time-quick-btn" data-jump="mid">Middle</button>
-                    <button class="time-quick-btn" data-jump="end">End</button>
-                </div>
-            </div>
-        </div>
-
     </div>
+    <!-- END of control-panel -->
 
-    <div id="map"></div>
+    <!-- Main Layout Container (20:80 split) -->
+    <div class="main-container">
+        <!-- Left Sidebar (20%) - control-panel moves here via JS -->
+        <aside id="sidebar"></aside>
+        
+        <!-- Map Area (80%) -->
+        <div id="map"></div>
+    </div>
 
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Move control-panel into sidebar on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const controlPanel = document.getElementById('control-panel');
+            if (sidebar && controlPanel) {
+                sidebar.appendChild(controlPanel);
+            }
+        });
+    </script>
     <script src="./app.js"></script>
 </body>
 
