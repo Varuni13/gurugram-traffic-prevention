@@ -1,0 +1,22 @@
+{
+  "generated_at_utc": "2026-01-23T12:00:07.506364+00:00",
+  "generated_at_local": "2026-01-23 17:30:07 IST",
+  "count": 1,
+  "points": [
+    {
+      "currentSpeed_kmph": 18,
+      "freeFlowSpeed_kmph": 29,
+      "currentTravelTime_s": 2333,
+      "freeFlowTravelTime_s": 1448,
+      "delay_s": 885,
+      "speed_ratio": 0.6206896551724138,
+      "confidence": 0.996411,
+      "frc": "FRC4",
+      "name": "Shankar Chowk / Cyber City",
+      "query_lat": 28.508064947117724,
+      "query_lon": 77.08211742534732,
+      "timestamp_utc": "2026-01-23T12:00:07.506364+00:00",
+      "timestamp_local": "2026-01-23 17:30:07 IST"
+    }
+  ]
+}

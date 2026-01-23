@@ -181,6 +181,13 @@ def get_flooded_roads(time_param: Optional[str] = None) -> dict:
 
     try:
         flood_path, _ = resolve_flood_path_by_index(time_param)
+        
+        # Create cache key (unique identifier for this combination)
+        cache_key = f"{roads_path.name}_{flood_path.name}"
+        
+        # Check if result is already cached
+        if cache_key in _FLOOD_ROADS_CACHE:
+            return _FLOOD_ROADS_CACHE[cache_key]
 
         roads = gpd.read_file(roads_path)
         flood = gpd.read_file(flood_path)
@@ -240,6 +247,10 @@ def get_flooded_roads(time_param: Optional[str] = None) -> dict:
             "flood_file": flood_path.name,
             "count": len(out.get("features", []))
         })
+        
+        # Save result to cache for future requests
+        _FLOOD_ROADS_CACHE[cache_key] = out
+        
         return out
 
     except FileNotFoundError as e:
