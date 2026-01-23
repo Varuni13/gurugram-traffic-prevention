@@ -262,3 +262,6 @@
 [2026-01-23 16:40:34] 🌞 PEAK | Interval: 10 min | Starting collection #3...
 [2026-01-23 16:41:00] ✅ Collection completed successfully
 [2026-01-23 16:41:10] 💤 Next collection at 16:50:00 (10 min interval)
+[2026-01-23 16:50:00] 🌞 PEAK | Interval: 10 min | Starting collection #4...
+[2026-01-23 16:50:26] ✅ Collection completed successfully
+[2026-01-23 16:50:26] 💤 Next collection at 17:00:00 (10 min interval)
