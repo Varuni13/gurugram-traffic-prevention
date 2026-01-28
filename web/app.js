@@ -70,6 +70,29 @@ const ALERT_COOLDOWN = 60000; // 1 minute cooldown between alerts
 let previousTrafficState = { heavy: null, moderate: null, smooth: null };
 let isInitialLoad = true; // Skip alerts on first page load
 
+// Center popup notification (top center, disappears after 2 seconds)
+function showCenterPopup(message, icon = '✅') {
+  // Remove any existing popup
+  const existing = document.querySelector('.center-popup');
+  if (existing) existing.remove();
+  
+  const popup = document.createElement('div');
+  popup.className = 'center-popup';
+  popup.innerHTML = `
+    <span class="center-popup-icon">${icon}</span>
+    <span>${message}</span>
+  `;
+  
+  document.body.appendChild(popup);
+  
+  // Remove after 2 seconds
+  setTimeout(() => {
+    if (popup.parentElement) {
+      popup.remove();
+    }
+  }, 2000);
+}
+
 function showToast(message, type = 'error', title = 'Alert') {
   const container = document.getElementById('toastContainer');
   if (!container) return;
@@ -1005,25 +1028,25 @@ async function handleSearch() {
 /* =========================
    ROUTING - Multi-route comparison
 ========================= */
-// Route colors - avoiding traffic colors (green/red/orange in traffic)
+// Route colors - bright and distinct from traffic basemap colors
 const ROUTE_COLORS = {
-  shortest: "#673AB7",    // Purple
-  fastest: "#E91E63",     // Pink/Magenta
-  flood_avoid: "#1B5E20", // Dark Green
-  smart: "#000000"        // Black
+  shortest: "#a23eff",
+  Fastest: "#ca4588",
+  flood_avoid: "#0c9a89", 
+  smart: "#4B5563"
 };
 
 const ROUTE_WEIGHTS = {
-  shortest: 6,
-  fastest: 5,
-  flood_avoid: 5,
-  smart: 7
+  shortest: 7,
+  Fastest: 7,
+  flood_avoid: 7,
+  smart: 8
 };
 
 // Route layers for each type
 let routeLayers = {
   shortest: null,
-  fastest: null,
+  Fastest: null,
   flood_avoid: null,
   smart: null
 };
@@ -1097,7 +1120,7 @@ function setDestinationMode() {
 function getSelectedRouteTypes() {
   const types = [];
   if (document.getElementById("routeShortest")?.checked) types.push("shortest");
-  if (document.getElementById("routeTraffic")?.checked) types.push("fastest");
+  if (document.getElementById("routeTraffic")?.checked) types.push("Fastest");
   if (document.getElementById("routeFlood")?.checked) types.push("flood_avoid");
   if (document.getElementById("routeSmart")?.checked) types.push("smart");
   return types;
@@ -1235,6 +1258,7 @@ async function calculateAllRoutes() {
     return;
   }
 
+  showCenterPopup(`Calculating ${selectedTypes.length} route(s)...`, '⏳');
   setRouteStatus(`Calculating ${selectedTypes.length} route(s)...`);
 
   // Clear routes not selected
@@ -1262,8 +1286,8 @@ async function calculateAllRoutes() {
   });
 
   if (successCount > 0) {
-    setRouteStatus(`✅ ${successCount} route(s) ready`);
-    setTimeout(() => setRouteStatus(""), 1500);  // Hide quickly
+    setRouteStatus("");  // Clear status bar
+    showCenterPopup(`${successCount} Route${successCount > 1 ? 's' : ''} Ready`, '🛣️');
   } else {
     setRouteStatus("No routes found");
   }
@@ -1285,10 +1309,10 @@ async function updateRouteComparison(origin, dest) {
 
   // Route colors matching the map lines
   const types = [
-    { id: "shortest", label: "Shortest", color: "#673AB7" },
-    { id: "fastest", label: "Fastest", color: "#E91E63" },
-    { id: "flood_avoid", label: "Flood-Avoid", color: "#1B5E20" },
-    { id: "smart", label: "Smart", color: "#000000" }
+    { id: "shortest", label: "Shortest", color: "#9333EA" },
+    { id: "Fastest", label: "Traffic optimized", color: "#EC4899" },
+    { id: "flood_avoid", label: "Flood-Avoid", color: "#14B8A6" },
+    { id: "smart", label: "Smart", color: "#4B5563" }
   ];
 
   try {
@@ -1310,7 +1334,7 @@ async function updateRouteComparison(origin, dest) {
 
     tbody.innerHTML = ""; // Clear loader
 
-    // Find the best (fastest) ETA among successful results
+    // Find the best (Fastest) ETA among successful results
     let bestEta = Infinity;
     results.forEach(res => {
       if (res.success && res.data.properties) {
@@ -1345,7 +1369,7 @@ async function updateRouteComparison(origin, dest) {
       tr.innerHTML = `
         <td><span class="route-color-dot" style="background:${type.color}"></span>${type.label}</td>
         <td>${distKm} km</td>
-        <td class="eta-cell">${etaMin} min${isBest ? '<span class="best-badge">Fastest</span>' : ''}</td>
+        <td class="eta-cell">${etaMin} min${isBest ? '<span class="best-badge"></span>' : ''}</td>
       `;
       tbody.appendChild(tr);
     });
@@ -1823,9 +1847,9 @@ function selectOriginResult(item, container) {
   originMarker = L.marker([lat, lon], {
     icon: L.divIcon({
       className: "custom-marker",
-      html: '<div class="marker-pin marker-origin-pin"><span>A</span></div>',
-      iconSize: [30, 40],
-      iconAnchor: [15, 40]
+      html: '<div class="marker-tick marker-origin-tick"><span>A</span></div>',
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
     }),
     pane: "markerPane"
   }).addTo(map);
@@ -1852,9 +1876,9 @@ function selectDestResult(item, container) {
   destMarker = L.marker([lat, lon], {
     icon: L.divIcon({
       className: "custom-marker",
-      html: '<div class="marker-pin marker-dest-pin"><span>B</span></div>',
-      iconSize: [30, 40],
-      iconAnchor: [15, 40]
+      html: '<div class="marker-tick marker-dest-tick"><span>B</span></div>',
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
     }),
     pane: "markerPane"
   }).addTo(map);
@@ -1907,16 +1931,16 @@ if (swapLocationsBtn) {
       originMarker = L.marker([routeOrigin.lat, routeOrigin.lng], {
         icon: L.divIcon({
           className: "custom-marker",
-          html: '<div class="marker-pin marker-origin-pin"><span>A</span></div>',
-          iconSize: [30, 40], iconAnchor: [15, 40]
+          html: '<div class="marker-tick marker-origin-tick"><span>A</span></div>',
+          iconSize: [32, 32], iconAnchor: [16, 16]
         }), pane: "markerPane"
       }).addTo(map);
 
       destMarker = L.marker([routeDestination.lat, routeDestination.lng], {
         icon: L.divIcon({
           className: "custom-marker",
-          html: '<div class="marker-pin marker-dest-pin"><span>B</span></div>',
-          iconSize: [30, 40], iconAnchor: [15, 40]
+          html: '<div class="marker-tick marker-dest-tick"><span>B</span></div>',
+          iconSize: [32, 32], iconAnchor: [16, 16]
         }), pane: "markerPane"
       }).addTo(map);
     }

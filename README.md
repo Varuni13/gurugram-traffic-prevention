@@ -32,7 +32,7 @@ This dashboard addresses these challenges by:
 1. Providing **real-time traffic visualization** at 25 major hotspots
 2. Offering **flood-aware routing** that avoids waterlogged roads
 3. Enabling **time-travel simulation** to analyze historical flood scenarios
-4. Supporting **multiple routing strategies** (shortest, fastest, flood-avoiding, smart)
+4. Supporting **multiple routing strategies** (shortest, Fastest, flood-avoiding, smart)
 
 ---
 
@@ -60,7 +60,7 @@ This dashboard addresses these challenges by:
 ### 🛣️ Smart Routing Engine
 - **Multiple Route Types**:
   - `shortest`: Minimum distance path
-  - `fastest`: Minimum travel time (traffic-aware)
+  - `Fastest`: Minimum travel time (traffic-aware)
   - `flood_avoid`: Routes that completely avoid flooded roads
   - `smart`: Balanced approach considering all factors
 - **Real-time Traffic Integration**: Route calculations factor in current traffic conditions
@@ -582,7 +582,7 @@ GET /api/route?origin_lat={lat}&origin_lon={lon}&dest_lat={lat}&dest_lon={lon}&t
 | `origin_lon` | float | Yes | Starting longitude |
 | `dest_lat` | float | Yes | Destination latitude |
 | `dest_lon` | float | Yes | Destination longitude |
-| `type` | string | No | Route type: `shortest`, `fastest`, `flood_avoid`, `smart` (default: `fastest`) |
+| `type` | string | No | Route type: `shortest`, `Fastest`, `flood_avoid`, `smart` (default: `Fastest`) |
 | `flood_time` | integer | No | Flood time index for flood-aware routing |
 
 **Example:**

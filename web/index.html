@@ -71,7 +71,7 @@
     </div>
 
     <div id="control-panel">
-        <div class="panel-header">
+        <!-- <div class="panel-header">
             <div class="panel-title">
                 <span class="panel-icon">🗺️</span>
                 <span>Control Panel</span>
@@ -79,13 +79,13 @@
             <div class="data-status">
                 <span class="status-badge" id="dataStatus">Ready</span>
             </div>
-        </div>
+        </div> -->
 
-        <!-- SECTION 1: Time Travel (Compact design) -->
+        <!-- SECTION 1: Time Control -->
         <div class="accordion-section">
             <div class="accordion-header" onclick="toggleAccordion('timeSection')">
                 <span class="accordion-icon">⏱️</span>
-                <span class="accordion-title">Time Travel</span>
+                <span class="accordion-title">Time Control</span>
                 <span class="accordion-chevron" id="timeSection-chevron">▼</span>
             </div>
             <div class="accordion-content" id="timeSection">
@@ -105,15 +105,15 @@
             </div>
         </div>
 
-        <!-- SECTION 2: Popular Routes (Quick Presets) - OPEN BY DEFAULT -->
+        <!-- SECTION 2: Route Planner -->
         <div class="accordion-section">
             <div class="accordion-header" onclick="toggleAccordion('routePlanningSection')">
-                <span class="accordion-icon">⚡</span>
-                <span class="accordion-title">Popular Routes</span>
+                <span class="accordion-icon">📍</span>
+                <span class="accordion-title">Route Planner</span>
                 <span class="accordion-chevron" id="routePlanningSection-chevron">▼</span>
             </div>
             <div class="accordion-content" id="routePlanningSection">
-                <div class="hint" style="margin-bottom: 10px;">Select from 25 major traffic hotspots</div>
+                <!-- <div class="hint" style="margin-bottom: 6px; font-size: 9px;">Select from 25 major traffic hotspots</div> -->
                 <div class="quick-route-controls">
                     <div class="quick-route-row">
                         <label>From:</label>
@@ -178,8 +178,8 @@
                         </select>
                     </div>
                     <div class="btn-row">
-                        <button id="calculateQuickRouteBtn" class="btn btn-primary">🚀 Go!</button>
-                        <button id="clearQuickRoutesBtn" class="btn btn-secondary">🗑️ Clear</button>
+                        <button id="calculateQuickRouteBtn" class="btn btn-primary">Enter</button>
+                        <button id="clearQuickRoutesBtn" class="btn btn-secondary">Clear</button>
                     </div>
                 </div>
             </div>
@@ -188,14 +188,15 @@
         <!-- Route Status (always visible) -->
         <div id="routeSearchStatus" class="route-status"></div>
 
-        <!-- OR Divider -->
+        <!-- OR Divider (COMMENTED OUT with Custom Route)
         <div class="or-divider">
             <span class="or-line"></span>
             <span class="or-text">OR</span>
             <span class="or-line"></span>
         </div>
+        -->
 
-        <!-- SECTION 3: Custom Route Search -->
+        <!-- SECTION 3: Custom Route Search (COMMENTED OUT)
         <div class="accordion-section">
             <div class="accordion-header" onclick="toggleAccordion('customRouteSection')">
                 <span class="accordion-icon">🔍</span>
@@ -205,7 +206,6 @@
             <div class="accordion-content collapsed" id="customRouteSection">
                 <div class="hint" style="margin-bottom: 10px;">Search any location in Gurugram</div>
                 
-                <!-- Origin Search -->
                 <div class="route-search-row">
                     <span class="route-search-icon origin-icon">A</span>
                     <div class="search-container" style="flex: 1; position: relative;">
@@ -215,7 +215,6 @@
                     </div>
                 </div>
 
-                <!-- Destination Search -->
                 <div class="route-search-row">
                     <span class="route-search-icon dest-icon">B</span>
                     <div class="search-container" style="flex: 1; position: relative;">
@@ -225,7 +224,6 @@
                     </div>
                 </div>
 
-                <!-- Swap and Find Routes -->
                 <div style="display: flex; gap: 6px; margin-top: 10px;">
                     <button id="swapLocationsBtn" class="btn" style="padding: 8px 12px;"
                         title="Swap origin and destination">⇅</button>
@@ -233,38 +231,39 @@
                 </div>
             </div>
         </div>
+        -->
 
-        <!-- SECTION 4: Route Options -->
+        <!-- SECTION 4: Route Display -->
         <div class="accordion-section">
             <div class="accordion-header" onclick="toggleAccordion('routeOptionsSection')">
                 <span class="accordion-icon">🛤️</span>
-                <span class="accordion-title">Route Options</span>
-                <span class="accordion-chevron" id="routeOptionsSection-chevron">▶</span>
+                <span class="accordion-title">Route Display</span>
+                <span class="accordion-chevron" id="routeOptionsSection-chevron">▼</span>
             </div>
-            <div class="accordion-content collapsed" id="routeOptionsSection">
+            <div class="accordion-content" id="routeOptionsSection">
                 <div class="route-checkboxes">
                     <label class="row route-option">
                         <input type="checkbox" id="routeShortest" checked />
-                        <span class="route-swatch" style="background:#673AB7"></span>
-                        <span>Shortest (distance)</span>
+                        <span class="route-swatch" style="background:#a23eff"></span>
+                        <span>Shortest Distance</span>
                     </label>
                     <label class="row route-option">
                         <input type="checkbox" id="routeTraffic" checked />
-                        <span class="route-swatch" style="background:#E91E63"></span>
-                        <span>Traffic Avoiding Route</span>
+                        <span class="route-swatch" style="background:#ca4588"></span>
+                        <span>Traffic Optimized</span>
                     </label>
                     <label class="row route-option">
                         <input type="checkbox" id="routeFlood" checked />
-                        <span class="route-swatch" style="background:#1B5E20"></span>
-                        <span>Flood Avoiding Route</span>
+                        <span class="route-swatch" style="background:#0c9a89"></span>
+                        <span>Flood Avoidance</span>
                     </label>
                     <label class="row route-option">
                         <input type="checkbox" id="routeSmart" checked />
-                        <span class="route-swatch" style="background:#000000"></span>
-                        <span>Smart (avoiding both traffic and flood)</span>
+                        <span class="route-swatch" style="background:#4B5563"></span>
+                        <span>Smart Route (Optimal)</span>
                     </label>
                 </div>
-                <div class="hint" style="margin-top: 8px;">Check routes to compare on map</div>
+                <!-- <div class="hint" style="margin-top: 6px;">Check routes to compare on map</div> -->
 
                 <!-- Route Comparison Table -->
                 <div id="routeComparisonPanel"
@@ -286,26 +285,22 @@
             </div>
         </div>
 
-        <!-- SECTION 5: Map Layers -->
+        <!-- SECTION 5: Map Settings -->
         <div class="accordion-section">
             <div class="accordion-header" onclick="toggleAccordion('layersSection')">
                 <span class="accordion-icon">🗺️</span>
-                <span class="accordion-title">Map Layers</span>
-                <span class="accordion-chevron" id="layersSection-chevron">▶</span>
+                <span class="accordion-title">Map Settings</span>
+                <span class="accordion-chevron" id="layersSection-chevron">▼</span>
             </div>
-            <div class="accordion-content collapsed" id="layersSection">
+            <div class="accordion-content" id="layersSection">
                 <!-- Base Map Selector -->
                 <div class="map-style-selector">
-                    <label class="selector-label">Base Map Style</label>
+                    <!-- <label class="selector-label">Basemap: </label> -->
                     <select id="baseMapSelector" class="map-select">
                         <option value="googleStreets">Google Streets</option>
                         <option value="googleSatellite">Google Satellite</option>
                         <option value="googleHybrid">Google Hybrid</option>
                         <option value="googleTerrain">Google Terrain</option>
-                        <option value="osmStandard">OpenStreetMap</option>
-                        <option value="baseLight">Light (Carto)</option>
-                        <option value="baseDark">Dark (Carto)</option>
-                        <option value="satellite">Satellite (ESRI)</option>
                     </select>
                 </div>
 
@@ -313,22 +308,22 @@
 
                 <label class="row">
                     <input type="checkbox" id="toggleTrafficPoints" checked />
-                    <span>Traffic Status Points</span>
+                    <span>Traffic Indicators</span>
                 </label>
 
                 <label class="row">
                     <input type="checkbox" id="toggleTraffic" checked />
-                    <span>Live Traffic Layer</span>
+                    <span>Live Traffic Flow</span>
                 </label>
 
                 <label class="row">
                     <input type="checkbox" id="toggleFlood" checked />
-                    <span>Flooded Roads</span>
+                    <span>Flood Zones</span>
                 </label>
 
                 <label class="row">
                     <input type="checkbox" id="toggleRoadNetwork" />
-                    <span>All Roads Network</span>
+                    <span>Road Network</span>
                 </label>
             </div>
         </div>

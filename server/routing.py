@@ -1047,7 +1047,7 @@ def find_route(
     """
     route_type:
       - shortest:     minimize length
-      - fastest:      minimize travel_time (traffic)
+      - Fastest:      minimize travel_time (traffic)
       - flood_avoid:  minimize flood_cost (length + penalty on flooded)
       - smart:        minimize smart_cost (travel_time + penalty on flooded)
     """
@@ -1084,7 +1084,7 @@ def find_route(
     # 1) Traffic - SKIP for "shortest" route (only needs length attribute)
     t0 = time.perf_counter()
     t_traffic = 0.0
-    if route_type in ("fastest", "smart"):
+    if route_type in ("Fastest", "smart"):
         traffic_points = load_traffic_snapshot()
         apply_traffic_data(G, traffic_points)
         t_traffic = time.perf_counter() - t0
@@ -1119,7 +1119,7 @@ def find_route(
         return {"type": "FeatureCollection", "features": [], "error": "Origin and destination are the same"}
 
     # 4) Weight
-    if route_type == "fastest":
+    if route_type == "Fastest":
         weight = "travel_time"
     elif route_type == "flood_avoid":
         weight = "flood_cost"

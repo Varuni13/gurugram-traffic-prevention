@@ -243,7 +243,7 @@ def api_route():
     
     Query params:
       origin_lat, origin_lon, dest_lat, dest_lon
-      type: shortest | fastest | flood_avoid | smart
+      type: shortest | Fastest | flood_avoid | smart
       flood_time: selected flood index from slider
     """
     try:
@@ -266,7 +266,7 @@ def api_route():
             return jsonify({"error": "Coordinates must be valid numbers"}), 400
 
         # Validate route type
-        allowed = {"shortest", "fastest", "flood_avoid", "smart"}
+        allowed = {"shortest", "Fastest", "flood_avoid", "smart"}
         if route_type not in allowed:
             route_type = "shortest"
 
