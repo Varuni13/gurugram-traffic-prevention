@@ -56,7 +56,7 @@ LATEST_TRAFFIC_PATH = WEB_DIR / "data" / "latest_traffic.json"
 FLASK_HOST = os.getenv("FLASK_HOST", "0.0.0.0")  # Bind to all interfaces for network access
 FLASK_PORT = int(os.getenv("FLASK_PORT", "8888"))
 FLASK_DEBUG = os.getenv("FLASK_DEBUG", "False").lower() == "true"
-
+TOMTOM_KEY=os.getenv("TOMTOM_API_KEY", "")
 # CORS configuration
 CORS_ENABLED = os.getenv("CORS_ENABLED", "True").lower() == "true"
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*").split(",")
