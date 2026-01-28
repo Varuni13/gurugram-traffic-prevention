@@ -54,7 +54,7 @@ LATEST_TRAFFIC_PATH = WEB_DIR / "data" / "latest_traffic.json"
 # ============================================================================
 # Flask app config
 FLASK_HOST = os.getenv("FLASK_HOST", "0.0.0.0")  # Bind to all interfaces for network access
-FLASK_PORT = int(os.getenv("FLASK_PORT", "8000"))
+FLASK_PORT = int(os.getenv("FLASK_PORT", "8888"))
 FLASK_DEBUG = os.getenv("FLASK_DEBUG", "False").lower() == "true"
 
 # CORS configuration
@@ -66,16 +66,20 @@ CORS_ORIGINS = [origin.strip() for origin in CORS_ORIGINS]
 # API KEYS AND CREDENTIALS
 # ============================================================================
 # Load environment variables from .env if available
-env_path = PROJECT_ROOT / ".env"
+env_path = PROJECT_ROOT/".env"
 if env_path.exists():
-    load_dotenv(env_path)
+    load_dotenv(env_path, override=True)  # Force override
     print(f"[Config] Loaded environment from: {env_path}")
 
-TOMTOM_API_KEY = os.getenv("TOMTOM_API_KEY", "").strip()
+    TOMTOM_API_KEY = os.getenv("TOMTOM_API_KEY", "").strip()
 
-if not TOMTOM_API_KEY:
-    print("[WARNING] TOMTOM_API_KEY not set. TomTom endpoints will fail until configured.")
-
+# Verify it loaded
+    if TOMTOM_API_KEY:
+        print(f"[Config] API Key loaded: {TOMTOM_API_KEY[:4]}...{TOMTOM_API_KEY[-4:]}")
+    else:
+        print(f"[Config] ❌ WARNING: API Key still empty after loading .env")
+else:
+    print(f"[Config] ❌ ERROR: .env file not found at {env_path}")
 # ============================================================================
 # COLLECTOR CONFIGURATION
 # ============================================================================
@@ -190,6 +194,7 @@ def print_config_summary():
     print(f"Traffic Snapshots:   {TRAFFIC_SNAPSHOTS_DIR.exists()}")
     print(f"Graph Candidates:    {[p.exists() for p in GRAPH_CANDIDATES]}")
     print("=" * 70 + "\n")
+    print(f"🔗 Local access: http://localhost:{FLASK_PORT}\n")
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 import csv
 import json
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import requests
@@ -86,8 +86,11 @@ def main():
     web_data_dir.mkdir(parents=True, exist_ok=True)
 
     # timestamps
+    # Define IST timezone explicitly (fixes server timezone issues)
+    IST = timezone(timedelta(hours=5, minutes=30))
+
     ts_utc = datetime.now(timezone.utc).isoformat()
-    ts_local = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " IST"
+    ts_local = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S") + " IST"
 
     results = []
     total = len(MONITOR_POINTS)

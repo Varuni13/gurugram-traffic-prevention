@@ -3,8 +3,10 @@ console.log("APP.JS LOADED:", new Date().toISOString());
 /* =========================
    CONFIG
 ========================= */
-const API_BASE = "http://localhost:8000";
-// const API_BASE = "https://mobility.airesqclimsols.com/";
+// Detect environment automatically
+const API_BASE = window.location.hostname === 'localhost'
+  ? "http://localhost:8888"
+  : "https://mobility.airesqclimsols.com";
 
 // Filter to match traffic data window: 11:25 AM to 6:17 PM (18:17)
 // Using July 13, 2025 dates from flood files but matching the time window

@@ -313,3 +313,108 @@
 [2026-01-23 18:30:00] 🌞 PEAK | Interval: 10 min | Starting collection #4...
 [2026-01-23 18:30:24] ✅ Collection completed successfully
 [2026-01-23 18:30:24] 💤 Next collection at 18:40:00 (10 min interval)
+[2026-01-24 17:40:12] ============================================================
+[2026-01-24 17:40:12] 🚀 Smart Traffic Scheduler Started
+[2026-01-24 17:40:12]    Peak hours (6:00 - 21:00): Every 10 min
+[2026-01-24 17:40:12]    Off-peak: Every 60 min
+[2026-01-24 17:40:12]    PID: 12928
+[2026-01-24 17:40:12] ============================================================
+[2026-01-24 17:40:12] 🌞 PEAK | Interval: 10 min | Starting collection #1...
+[2026-01-24 17:40:36] ✅ Collection completed successfully
+[2026-01-24 17:40:36] 💤 Next collection at 17:50:00 (10 min interval)
+[2026-01-24 17:50:00] 🌞 PEAK | Interval: 10 min | Starting collection #2...
+[2026-01-24 17:50:25] ✅ Collection completed successfully
+[2026-01-24 17:50:25] 💤 Next collection at 18:00:00 (10 min interval)
+[2026-01-24 17:51:50] ============================================================
+[2026-01-24 17:51:50] 🚀 Smart Traffic Scheduler Started
+[2026-01-24 17:51:50]    Peak hours (6:00 - 21:00): Every 10 min
+[2026-01-24 17:51:50]    Off-peak: Every 60 min
+[2026-01-24 17:51:50]    PID: 16884
+[2026-01-24 17:51:50] ============================================================
+[2026-01-24 17:51:50] 🌞 PEAK | Interval: 10 min | Starting collection #1...
+[2026-01-24 17:52:11] ✅ Collection completed successfully
+[2026-01-24 17:52:11] 💤 Next collection at 18:00:00 (10 min interval)
+[2026-01-24 18:00:00] 🌞 PEAK | Interval: 10 min | Starting collection #2...
+[2026-01-24 18:00:27] ✅ Collection completed successfully
+[2026-01-24 18:00:27] 💤 Next collection at 18:10:00 (10 min interval)
+[2026-01-24 20:42:12] ============================================================
+[2026-01-24 20:42:12] 🚀 Smart Traffic Scheduler Started
+[2026-01-24 20:42:13]    Peak hours (6:00 - 21:00): Every 10 min
+[2026-01-24 20:42:13]    Off-peak: Every 60 min
+[2026-01-24 20:42:13]    PID: 3800949
+[2026-01-24 20:42:13] ============================================================
+[2026-01-24 20:42:13] 🌞 PEAK | Interval: 10 min | Starting collection #1...
+[2026-01-24 20:42:45] ============================================================
+[2026-01-24 20:42:45] 🚀 Smart Traffic Scheduler Started
+[2026-01-24 20:42:45]    Peak hours (6:00 - 21:00): Every 10 min
+[2026-01-24 20:42:45]    Off-peak: Every 60 min
+[2026-01-24 20:42:45]    PID: 3801304
+[2026-01-24 20:42:45] ============================================================
+[2026-01-24 20:42:45] 🌞 PEAK | Interval: 10 min | Starting collection #1...
+[2026-01-24 20:53:53] ============================================================
+[2026-01-24 20:53:53] 🚀 Smart Traffic Scheduler Started
+[2026-01-24 20:53:53]    Peak hours (6:00 - 21:00): Every 10 min
+[2026-01-24 20:53:53]    Off-peak: Every 60 min
+[2026-01-24 20:53:53]    PID: 3805063
+[2026-01-24 20:53:53] ============================================================
+[2026-01-24 20:53:53] 🌞 PEAK | Interval: 10 min | Starting collection #1...
+[2026-01-24 20:57:01] ============================================================
+[2026-01-24 20:57:01] 🚀 Smart Traffic Scheduler Started
+[2026-01-24 20:57:01]    Peak hours (6:00 - 21:00): Every 10 min
+[2026-01-24 20:57:01]    Off-peak: Every 60 min
+[2026-01-24 20:57:01]    PID: 3806465
+[2026-01-24 20:57:01] ============================================================
+[2026-01-24 20:57:01] 🌞 PEAK | Interval: 10 min | Starting collection #1...
+[2026-01-24 20:57:20] ✅ Collection completed successfully
+[2026-01-24 20:57:20] 💤 Next collection at 21:00:00 (10 min interval)
+[2026-01-24 21:00:00] ============================================================
+[2026-01-24 21:00:00] 🚀 Smart Traffic Scheduler Started
+[2026-01-24 21:00:00]    Peak hours (6:00 - 21:00): Every 10 min
+[2026-01-24 21:00:00]    Off-peak: Every 60 min
+[2026-01-24 21:00:00]    PID: 3807444
+[2026-01-24 21:00:00] ============================================================
+[2026-01-24 21:00:00] 🌙 OFF-PEAK | Interval: 60 min | Starting collection #1...
+[2026-01-24 21:00:19] ✅ Collection completed successfully
+[2026-01-24 21:00:19] 💤 Next collection at 22:00:00 (60 min interval)
+[2026-01-24 21:02:54] ============================================================
+[2026-01-24 21:02:54] 🚀 Smart Traffic Scheduler Started
+[2026-01-24 21:02:54]    Peak hours (6:00 - 21:00): Every 10 min
+[2026-01-24 21:02:54]    Off-peak: Every 60 min
+[2026-01-24 21:02:54]    PID: 3810382
+[2026-01-24 21:02:54] ============================================================
+[2026-01-24 21:02:54] 🌙 OFF-PEAK | Interval: 60 min | Starting collection #1...
+[2026-01-24 21:03:13] ✅ Collection completed successfully
+[2026-01-24 21:03:13] 💤 Next collection at 22:00:00 (60 min interval)
+[2026-01-24 21:22:36] ============================================================
+[2026-01-24 21:22:36] 🚀 Smart Traffic Scheduler Started
+[2026-01-24 21:22:36]    Peak hours (6:00 - 21:00): Every 10 min
+[2026-01-24 21:22:36]    Off-peak: Every 60 min
+[2026-01-24 21:22:36]    PID: 3817681
+[2026-01-24 21:22:36] ============================================================
+[2026-01-24 21:22:36] 🌙 OFF-PEAK | Interval: 60 min | Starting collection #1...
+[2026-01-24 21:22:55] ✅ Collection completed successfully
+[2026-01-24 21:22:55] 💤 Next collection at 22:00:00 (60 min interval)
+[2026-01-27 12:25:42] ============================================================
+[2026-01-27 12:25:43] 🚀 Smart Traffic Scheduler Started
+[2026-01-27 12:25:43]    Peak hours (6:00 - 21:00): Every 10 min
+[2026-01-27 12:25:43]    Off-peak: Every 60 min
+[2026-01-27 12:25:43]    PID: 903936
+[2026-01-27 12:25:43] ============================================================
+[2026-01-27 12:25:43] 🌞 PEAK | Interval: 10 min | Starting collection #1...
+[2026-01-27 12:26:02] ✅ Collection completed successfully
+[2026-01-27 12:26:02] 💤 Next collection at 12:30:00 (10 min interval)
+[2026-01-28 10:36:04] ============================================================
+[2026-01-28 10:36:04] 🚀 Smart Traffic Scheduler Started
+[2026-01-28 10:36:04]    Peak hours (6:00 - 21:00): Every 10 min
+[2026-01-28 10:36:04]    Off-peak: Every 60 min
+[2026-01-28 10:36:04]    PID: 8740
+[2026-01-28 10:36:04] ============================================================
+[2026-01-28 10:36:04] 🌞 PEAK | Interval: 10 min | Starting collection #1...
+[2026-01-28 10:36:32] ✅ Collection completed successfully
+[2026-01-28 10:36:32] 💤 Next collection at 10:40:00 (10 min interval)
+[2026-01-28 10:40:00] 🌞 PEAK | Interval: 10 min | Starting collection #2...
+[2026-01-28 10:40:23] ✅ Collection completed successfully
+[2026-01-28 10:40:23] 💤 Next collection at 10:50:00 (10 min interval)
+[2026-01-28 10:50:00] 🌞 PEAK | Interval: 10 min | Starting collection #3...
+[2026-01-28 10:50:26] ✅ Collection completed successfully
+[2026-01-28 10:50:26] 💤 Next collection at 11:00:00 (10 min interval)
