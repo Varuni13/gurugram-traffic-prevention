@@ -283,7 +283,7 @@ No changes needed for end-users, but developers should:
    ```python
    import config
    # Instead of:
-   # import os; TOMTOM_KEY = os.getenv("TOMTOM_API_KEY")
+   # import os; TOMTOM_API_KEY = os.getenv("TOMTOM_API_KEY")
    ```
 
 2. Use handler functions:

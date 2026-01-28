@@ -206,7 +206,7 @@ Syntax Validation: 100% ✓
 import config  # Single import gets everything
 host = config.FLASK_HOST
 port = config.FLASK_PORT
-tomtom_key = config.TOMTOM_API_KEY
+TOMTOM_API_KEY = config.TOMTOM_API_KEY
 ```
 
 ### Modular Handlers

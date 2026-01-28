@@ -62,7 +62,7 @@ except ImportError:
 # ============================================================================
 # USE GLOBAL CONFIGURATION
 # ============================================================================
-TOMTOM_KEY = global_config.TOMTOM_API_KEY
+TOMTOM_API_KEY = global_config.TOMTOM_API_KEY
 GEOPANDAS_OK = global_config.GEOPANDAS_OK
 gpd = global_config.gpd
 shape = global_config.shape
@@ -202,12 +202,12 @@ def api_tomtom_geocode():
     search_query = request.args.get("search", "").strip()
     if not search_query:
         return jsonify({"error": "Missing 'search' parameter"}), 400
-    if not TOMTOM_KEY:
+    if not TOMTOM_API_KEY:
         return jsonify({"error": "TOMTOM_API_KEY is not set on server"}), 500
 
     url = f"https://api.tomtom.com/search/2/geocode/{search_query}.json"
     try:
-        resp = requests.get(url, params={"key": TOMTOM_KEY}, timeout=12)
+        resp = requests.get(url, params={"key": TOMTOM_API_KEY}, timeout=12)
         resp.raise_for_status()
         return jsonify(resp.json())
     except Exception as e:
@@ -217,12 +217,12 @@ def api_tomtom_geocode():
 @app.route("/api/tomtom/traffic-tiles/<int:z>/<int:x>/<int:y>")
 def api_tomtom_traffic_tiles(z: int, x: int, y: int):
     """Proxy TomTom traffic tiles endpoint."""
-    if not TOMTOM_KEY:
+    if not TOMTOM_API_KEY:
         return jsonify({"error": "TOMTOM_API_KEY is not set on server"}), 500
 
     url = f"https://api.tomtom.com/traffic/map/4/tile/flow/relative0/{z}/{x}/{y}.png"
     try:
-        resp = requests.get(url, params={"key": TOMTOM_KEY}, timeout=12)
+        resp = requests.get(url, params={"key": TOMTOM_API_KEY}, timeout=12)
         resp.raise_for_status()
 
         response = make_response(resp.content)
